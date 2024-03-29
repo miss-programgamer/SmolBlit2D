@@ -53,18 +53,23 @@ namespace Smol::Blit2D
 		const Color& At(const Vec2I& pos) const;
 		
 		
+		// Get this bitmap's width.
 		constexpr uint16_t GetWidth() const
 		{ return size.w; }
 		
+		// Get this bitmap's height.
 		constexpr uint16_t GetHeight() const
 		{ return size.h; }
 		
+		// Get this bitmap's size.
 		constexpr SizeI GetSize() const
 		{ return { size.w, size.h }; }
 		
+		// Get this bitmap's area.
 		constexpr int GetArea() const
 		{ return size.w * size.h; }
 		
+		// Check whether this bitmap contains anything.
 		constexpr operator bool() const
 		{ return colors != nullptr; }
 	};

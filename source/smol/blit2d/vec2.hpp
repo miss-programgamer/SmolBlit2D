@@ -4,6 +4,7 @@
 
 namespace Smol::Blit2D
 {
+	// A 2D vector represented by components on two axes.
 	template<typename T>
 	struct Vec2
 	{

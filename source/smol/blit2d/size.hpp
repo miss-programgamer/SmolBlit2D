@@ -4,6 +4,7 @@
 
 namespace Smol::Blit2D
 {
+	// A 2D size represented by two component values.
 	template<typename T>
 	struct Size
 	{

@@ -14,7 +14,7 @@
 
 namespace Smol::Blit2D
 {
-	// 
+	// Option values relevant to drawing bitmaps.
 	struct BlitOptions
 	{
 		bool flipx;
@@ -22,7 +22,7 @@ namespace Smol::Blit2D
 	};
 	
 	
-	// 
+	// Holds state & functionality relevant to drawing.
 	class Renderer
 	{
 		Bitmap main_target;
@@ -35,6 +35,9 @@ namespace Smol::Blit2D
 		
 		
 	 public:
+		// Construct a renderer.
+		Renderer(int width, int height) noexcept;
+		
 		// Construct a renderer.
 		Renderer(SizeI size) noexcept;
 		

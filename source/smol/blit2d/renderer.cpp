@@ -3,6 +3,12 @@
 #include <algorithm>
 
 
+Smol::Blit2D::Renderer::Renderer(int width, int height) noexcept:
+	main_target(width, height),
+	target(&main_target)
+{}
+
+
 Smol::Blit2D::Renderer::Renderer(SizeI size) noexcept:
 	main_target(size.w, size.h),
 	target(&main_target)
@@ -47,9 +53,6 @@ Smol::Blit2D::Bitmap Smol::Blit2D::Renderer::ConvertToBitmap(const PalBitmap& bi
 
 void Smol::Blit2D::Renderer::DrawFill()
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto ptr = &target->At({ 0, 0 });
 	std::fill(ptr, ptr + target->GetArea(), color);
 }
@@ -57,9 +60,6 @@ void Smol::Blit2D::Renderer::DrawFill()
 
 void Smol::Blit2D::Renderer::DrawPoint(const Vec2I& pos)
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto tsize = target->GetSize();
 	
 	if (pos.x < 0 || pos.x >= tsize.w || pos.y < 0 || pos.y >= tsize.h)
@@ -72,9 +72,6 @@ void Smol::Blit2D::Renderer::DrawPoint(const Vec2I& pos)
 
 void Smol::Blit2D::Renderer::DrawStride(const Vec2I& pos, int width)
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto tsize = target->GetSize();
 	
 	if (pos.x <= -width || pos.x >= tsize.w || pos.y < 0 || pos.y >= tsize.h)
@@ -90,13 +87,10 @@ void Smol::Blit2D::Renderer::DrawStride(const Vec2I& pos, int width)
 
 void Smol::Blit2D::Renderer::DrawRect(const RectI& dest)
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto tsize = target->GetSize();
 	auto dst_size = dest.GetSize();
 	
-	if (dest.r < 0 || dest.l > tsize.w || dest.b < 0 || dest.t > tsize.h)
+	if (dest.r < 0 || dest.l >= tsize.w || dest.b < 0 || dest.t >= tsize.h)
 	{ return; }
 	
 	int x = std::max<int>(0, dest.l);
@@ -114,13 +108,10 @@ void Smol::Blit2D::Renderer::DrawRect(const RectI& dest)
 
 void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const Vec2I& pos, BlitOptions opts)
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto tsize = target->GetSize();
 	auto bmp_size = bitmap.GetSize();
 	
-	if (pos.x < -bmp_size.w || pos.x > tsize.w || pos.y < -bmp_size.h || pos.y > tsize.h)
+	if (pos.x <= -bmp_size.w || pos.x >= tsize.w || pos.y <= -bmp_size.h || pos.y >= tsize.h)
 	{ return; }
 	
 	auto x = std::max<int>(0, pos.x);
@@ -136,13 +127,10 @@ void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const Vec2I& pos, 
 
 void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const RectI& source, const Vec2I& pos, BlitOptions opts)
 {
-	if (target == nullptr)
-	{ throw std::logic_error("renderer target was null"); }
-	
 	auto tsize = target->GetSize();
 	auto src_size = source.GetSize();
 	
-	if (pos.x < -src_size.w || pos.x > tsize.w || pos.y < -src_size.h || pos.y > tsize.h)
+	if (pos.x <= -src_size.w || pos.x >= tsize.w || pos.y <= -src_size.h || pos.y >= tsize.h)
 	{ return; }
 	
 	int x = std::max<int>(0, pos.x);

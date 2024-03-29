@@ -64,10 +64,14 @@ Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view titl
 }
 
 
-void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, const Bitmap& bitmap)
+void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, const Bitmap& bitmap, std::function<const Bitmap*()> callback)
 {
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
+	
+	this->callback = std::move(callback);
+	
+	SetTimer(hWnd, 0, 1000/50, NULL);
 	
 	asdf->Release();
 	rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
@@ -99,6 +103,9 @@ LRESULT Smol::Blit2D::ExampleApp::HandleWindowMessage(_In_ HWND hWnd, _In_ UINT 
 		
 		case WM_SIZE:
 			return HandleSizeMessage(hWnd, message, wParam, lParam);
+		
+		case WM_TIMER:
+			return HandleTimerMessage(hWnd, message, wParam, lParam);
 		
 		case WM_PAINT:
 			return HandlePaintMessage(hWnd, message, wParam, lParam);
@@ -139,6 +146,18 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 	auto width = LOWORD(lParam);
 	auto height = HIWORD(lParam);
 	rt->Resize(D2D1::SizeU(width, height));
+	return 0;
+}
+
+
+LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+	auto& bitmap = *callback();
+	
+	asdf->Release();
+	rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+	
 	return 0;
 }
 

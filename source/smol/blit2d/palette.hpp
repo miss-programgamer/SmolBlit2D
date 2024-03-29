@@ -16,7 +16,7 @@ namespace Smol::Blit2D
 	// A list of at most 256 colors used to draw palette bitmaps.
 	class Palette
 	{
-		static inline Color empty = NamedColor::Empty;
+		static inline Color empty = ColorName::Empty;
 		
 		
 		Color colors[255];
@@ -25,7 +25,7 @@ namespace Smol::Blit2D
 	 public:
 		// Construct an empty palette.
 		constexpr Palette() noexcept:
-			colors{0}
+			colors{ ColorName::Empty }
 		{}
 		
 		// Construct a palette from a given list.

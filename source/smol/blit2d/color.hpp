@@ -4,14 +4,24 @@
 
 namespace Smol::Blit2D
 {
-	enum class NamedColor
+	// Color names
+	enum class ColorName
 	{
 		Empty,
 		Black,
 		White,
+		
+		Red,
+		Green,
+		Blue,
+		
+		Yellow,
+		Magenta,
+		Cyan,
 	};
 	
 	
+	// Color struct in RGBA128 float format.
 	struct Color
 	{
 		float r;
@@ -36,17 +46,53 @@ namespace Smol::Blit2D
 		{}
 		
 		// Construct a grayscale color from an intensity and alpha
-		constexpr Color(NamedColor named_color) noexcept:
+		constexpr Color(ColorName name) noexcept:
 			r(0), g(0), b(0), a(0)
 		{
-			switch (named_color)
+			switch (name)
 			{
-				case NamedColor::Empty:
+				case ColorName::Empty:
 					*this = { 0, 0, 0, 0 };
+					break;
+				
+				case ColorName::Black:
+					*this = { 0, 0, 0, 1 };
+					break;
+				
+				case ColorName::White:
+					*this = { 1, 1, 1, 1 };
+					break;
+				
+				case ColorName::Red:
+					*this = { 1, 0, 0, 1 };
+					break;
+				
+				case ColorName::Green:
+					*this = { 0, 1, 0, 1 };
+					break;
+				
+				case ColorName::Blue:
+					*this = { 0, 0, 1, 1 };
+					break;
+				
+				case ColorName::Yellow:
+					*this = { 1, 1, 0, 1 };
+					break;
+				
+				case ColorName::Magenta:
+					*this = { 1, 0, 1, 1 };
+					break;
+				
+				case ColorName::Cyan:
+					*this = { 0, 1, 1, 1 };
 					break;
 			}
 		}
 		
+		
+		// Get a copy of this color with its alpha replaced.
+		constexpr Color GetFaded(float alpha) const
+		{ return { r, g, b, alpha }; }
 		
 		// Get an opaque copy of this color.
 		constexpr Color GetOpaque() const

@@ -3,6 +3,7 @@
 
 
 #include <string_view>
+#include <functional>
 #include <windows.h>
 #include <tchar.h>
 #include <d2d1.h>
@@ -32,6 +33,8 @@ namespace Smol::Blit2D
 		
 		ID2D1Bitmap* asdf;
 		
+		std::function<const Bitmap*()> callback;
+		
 		
 	 public:
 		static bool RegisterMainWindowClass(HINSTANCE hInstance);
@@ -40,7 +43,7 @@ namespace Smol::Blit2D
 		
 		ExampleApp(HINSTANCE hInstance, std::wstring_view title) noexcept;
 		
-		void ShowMainWindow(int nCmdShow, const Bitmap& bitmap);
+		void ShowMainWindow(int nCmdShow, const Bitmap& bitmap, std::function<const Bitmap*()> callback);
 		
 		static LRESULT WindowProc(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
@@ -51,6 +54,8 @@ namespace Smol::Blit2D
 		LRESULT HandleDestroyMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
 		LRESULT HandleSizeMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
+		
+		LRESULT HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
 		LRESULT HandlePaintMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
