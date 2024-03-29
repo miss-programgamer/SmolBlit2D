@@ -17,10 +17,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{ return ErrorMessageBox(L"Failed to register main window class", 1); }
 	
 	// Create blit2d renderer
-	Renderer renderer;
+	Renderer renderer({ 150, 100 });
 	
 	Bitmap smiley(8, 8);
-	renderer.SetTarget(smiley);
+	renderer.SetTarget(&smiley);
 	renderer.SetColor({ 1, 1, 1, 1 });
 	renderer.DrawFill();
 	renderer.SetColor({ 0.5f, 0.5f, 0.5f, 1 });
@@ -32,8 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	renderer.DrawPoint({ 1, 5 });
 	renderer.DrawPoint({ 6, 5 });
 	
-	Bitmap target(150, 100);
-	renderer.SetTarget(target);
+	renderer.SetTarget(nullptr);
 	renderer.SetColor({ 0, 0, 0 });
 	renderer.DrawFill();
 	renderer.DrawBitmap(smiley, { -2, -2 });
@@ -49,7 +48,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{ return ErrorMessageBox(L"Failed to create main window", 1); }
 	
 	// Show main window
-	example_app.ShowMainWindow(nCmdShow, target);
+	example_app.ShowMainWindow(nCmdShow, renderer.GetMainTarget());
 	
 	// Main loop
 	return ExampleApp::RunApp();

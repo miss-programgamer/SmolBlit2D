@@ -8,11 +8,13 @@
 #include "rect.hpp"
 #include "color.hpp"
 #include "palette.hpp"
+#include "pal_bitmap.hpp"
 #include "bitmap.hpp"
 
 
 namespace Smol::Blit2D
 {
+	// 
 	struct BlitOptions
 	{
 		bool flipx;
@@ -20,8 +22,11 @@ namespace Smol::Blit2D
 	};
 	
 	
+	// 
 	class Renderer
 	{
+		Bitmap main_target;
+		
 		Bitmap* target;
 		
 		Palette* palette;
@@ -31,17 +36,26 @@ namespace Smol::Blit2D
 		
 	 public:
 		// Construct a renderer.
-		Renderer() noexcept;
+		Renderer(SizeI size) noexcept;
 		
 		
 		// Set the target onto which we are drawing.
-		void SetTarget(Bitmap& bitmap);
+		void SetTarget(Bitmap* bitmap);
 		
 		// Set the palette used by this renderer.
-		void SetPalette(Palette& palette);
+		void SetPalette(Palette* palette);
 		
 		// Set the color used to tint bitmaps and primitives.
 		void SetColor(const Color& color);
+		
+		
+		// Convert a palette bitmap to a bitmap using our palette.
+		Bitmap ConvertToBitmap(const PalBitmap& bitmap);
+		
+		
+		// Get a reference to the main target.
+		inline const Bitmap& GetMainTarget() const
+		{ return main_target; }
 		
 		
 		// Fill the entire target with a solid color.
@@ -58,6 +72,14 @@ namespace Smol::Blit2D
 		
 		// Draw a bitmap at the given position.
 		void DrawBitmap(const Bitmap& bitmap, const Vec2I& pos, BlitOptions opts = {});
+		
+		// Draw a bitmap section at the given position.
+		void DrawBitmap(const Bitmap& bitmap, const RectI& source, const Vec2I& pos, BlitOptions opts = {});
+		
+		
+	 private:
+		// Draw a bitmap section after its bounds have been computed.
+		void DrawBitmap(const Bitmap& bitmap, Vec2I pos, SizeI size, Vec2I offset, BlitOptions opts);
 	};
 }
 

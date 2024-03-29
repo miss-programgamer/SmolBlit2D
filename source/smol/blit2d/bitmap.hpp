@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "vec2.hpp"
+#include "size.hpp"
 #include "color.hpp"
 
 
@@ -15,22 +16,26 @@ namespace Smol::Blit2D
 	{
 		Color* colors;
 		
-		uint16_t width;
-		
-		uint16_t height;
+		Size<uint16_t> size;
 		
 		
 	 public:
 		// Construct an empty bitmap.
 		constexpr Bitmap() noexcept:
 			colors(nullptr),
-			width(0), height(0)
+			size{ 0, 0 }
 		{}
 		
 		// Construct a bitmap of the given dimensions.
 		inline Bitmap(uint16_t width, uint16_t height) noexcept:
 			colors(new Color[width * height]),
-			width(width), height(height)
+			size{ width, height }
+		{}
+		
+		// Construct a bitmap of the given dimensions.
+		inline Bitmap(Size<uint16_t> size) noexcept:
+			colors(new Color[size.w * size.h]),
+			size(size)
 		{}
 		
 		// Destruct this bitmap.
@@ -49,13 +54,16 @@ namespace Smol::Blit2D
 		
 		
 		constexpr uint16_t GetWidth() const
-		{ return width; }
+		{ return size.w; }
 		
 		constexpr uint16_t GetHeight() const
-		{ return height; }
+		{ return size.h; }
 		
-		constexpr Vec2I GetSize() const
-		{ return { width, height }; }
+		constexpr SizeI GetSize() const
+		{ return { size.w, size.h }; }
+		
+		constexpr int GetArea() const
+		{ return size.w * size.h; }
 		
 		constexpr operator bool() const
 		{ return colors != nullptr; }

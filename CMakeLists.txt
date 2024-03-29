@@ -7,6 +7,7 @@ enable_testing()
 
 set(SMOL_BLIT2D_SOURCE
 	"./source/smol/blit2d/vec2.hpp"
+	"./source/smol/blit2d/size.hpp"
 	"./source/smol/blit2d/rect.hpp"
 	"./source/smol/blit2d/color.hpp"
 	"./source/smol/blit2d/palette.hpp"
