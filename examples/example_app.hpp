@@ -34,7 +34,7 @@ namespace Smol::Blit2D
 		
 		ID2D1SolidColorBrush* brush;
 		
-		ID2D1Bitmap* asdf;
+		ID2D1Bitmap* bitmap_target;
 		
 		std::function<const Bitmap*()> callback;
 		
@@ -44,7 +44,7 @@ namespace Smol::Blit2D
 		
 		static int RunApp();
 		
-		ExampleApp(HINSTANCE hInstance, std::wstring_view title) noexcept;
+		ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept;
 		
 		void ShowMainWindow(int nCmdShow, std::function<const Bitmap*()> callback);
 		
@@ -66,6 +66,11 @@ namespace Smol::Blit2D
 		{ return hWnd; }
 		
 		
+	 private:
+		void UpdateBitmapTarget(const Bitmap& bitmap);
+		
+		
+	 public:
 		static std::optional<Bitmap> LoadBitmap(const char* filename);
 	};
 }

@@ -10,6 +10,11 @@ static int ErrorMessageBox(const wchar_t* message, int error_code = 1)
 }
 
 
+constexpr tileidx_t GrassTile = 1;
+constexpr tileidx_t DirtTile = 2;
+constexpr tileidx_t RockTile = 3;
+
+
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	// Register example app main window class
@@ -19,7 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	int x = 0;
 	
 	// Create blit2d renderer
-	Renderer renderer(150, 100);
+	Renderer renderer(160, 120);
 	
 	// Load a smiley bitmap
 	Bitmap smiley = *ExampleApp::LoadBitmap("assets/smiley.bmp");
@@ -28,14 +33,26 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Bitmap ground = *ExampleApp::LoadBitmap("assets/ground.bmp");
 	Tileset ground_tileset({ 2, 2 }, { 8, 8 });
 	
+	// Create a tilemap made of ground tiles
+	Tilemap tilemap(160 / 8, 120 / 8);
+	
+	for (int i = 0; i < tilemap.GetWidth(); i++)
+	{ tilemap.At({ i, tilemap.GetHeight() - 3 }) = GrassTile; }
+	
+	for (int i = 0; i < tilemap.GetWidth(); i++)
+	{ tilemap.At({ i, tilemap.GetHeight() - 2 }) = DirtTile; }
+	
+	for (int i = 0; i < tilemap.GetWidth(); i++)
+	{ tilemap.At({ i, tilemap.GetHeight() - 1 }) = DirtTile; }
+	
 	// Create example app
-	ExampleApp example_app(hInstance, L"Example 1");
+	ExampleApp example_app(hInstance, L"Example 1", 640, 480);
 	
 	if (!example_app)
 	{ return ErrorMessageBox(L"Failed to create main window", 1); }
 	
 	// Show main window
-	example_app.ShowMainWindow(nCmdShow, [&renderer, &smiley, &x, &ground, &ground_tileset]() -> const Bitmap*
+	example_app.ShowMainWindow(nCmdShow, [&renderer, &smiley, &x, &ground, &ground_tileset, &tilemap]() -> const Bitmap*
 	{
 		// Process our frame logic
 		x += 2;
@@ -58,13 +75,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		renderer.DrawBitmap(smiley, { 4, 4, 8, 8 }, { 75, 65 });
 		renderer.DrawBitmap(smiley, { 0, 4, 4, 8 }, { 70, 65 });
 		
-		// Draw some tiles
-		renderer.DrawTile(ground, ground_tileset, 1, { 24, 24 });
-		renderer.DrawTile(ground, ground_tileset, 1, { 32, 24 });
-		renderer.DrawTile(ground, ground_tileset, 1, { 40, 24 });
-		renderer.DrawTile(ground, ground_tileset, 2, { 24, 32 });
-		renderer.DrawTile(ground, ground_tileset, 2, { 32, 32 });
-		renderer.DrawTile(ground, ground_tileset, 2, { 40, 32 });
+		// Draw a tilemap
+		renderer.DrawTilemap(ground, ground_tileset, tilemap, { 0, 0 });
 		
 		// Draw a moving smiley
 		renderer.DrawBitmap(smiley, { x, 40 });

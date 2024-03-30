@@ -84,7 +84,8 @@ namespace Smol::Blit2D
 		// Draw a tile from a tilemap at the given position.
 		void DrawTile(const Bitmap& bitmap, const Tileset& tileset, tileidx_t index, const Vec2I& pos, BlitOptions opts = {});
 		
-		// void DrawTilemap();
+		// Draw a tilemap using a given tileset at the given position.
+		void DrawTilemap(const Bitmap& bitmap, const Tileset& tileset, const Tilemap& tilemap, const Vec2I& pos);
 		
 		
 	 private:

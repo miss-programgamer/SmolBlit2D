@@ -164,6 +164,45 @@ void Smol::Blit2D::Renderer::DrawTile(const Bitmap& bitmap, const Tileset& tiles
 }
 
 
+void Smol::Blit2D::Renderer::DrawTilemap(const Bitmap& bitmap, const Tileset& tileset, const Tilemap& tilemap, const Vec2I& pos)
+{
+	auto tsize = target->GetSize();
+	auto map_size = tilemap.GetSize();
+	auto tile_size = tileset.GetTileSize();
+	SizeI map_scale
+	{
+		map_size.w * tile_size.w,
+		map_size.h * tile_size.h,
+	};
+	
+	if (pos.x <= -map_scale.w || pos.x >= tsize.w || pos.y <= -map_scale.h || pos.y >= tsize.h)
+	{ return; }
+	
+	for (int ty = 0; ty < map_size.h; ty++)
+	{
+		for (int tx = 0; tx < map_size.w; tx++)
+		{
+			auto tpos = Vec2I{ pos.x + tx * tile_size.w, pos.y + ty * tile_size.h };
+			auto index = tilemap.At({ tx, ty });
+			auto src_rect = tileset.GetSourceRect(index);
+			auto src_size = src_rect.GetSize();
+			
+			if (index == 0 || tpos.x <= -src_size.w || tpos.x >= tsize.w || tpos.y <= -src_size.h || tpos.y >= tsize.h)
+			{ continue; }
+			
+			int x = std::max<int>(0, tpos.x);
+			int y = std::max<int>(0, tpos.y);
+			int w = std::min<int>({ src_size.w, tpos.x + src_size.w, tsize.w - tpos.x });
+			int h = std::min<int>({ src_size.h, tpos.y + src_size.h, tsize.h - tpos.y });
+			int ox = (tpos.x < 0) ? src_rect.l + src_size.w - w : src_rect.l;
+			int oy = (tpos.y < 0) ? src_rect.t + src_size.h - h : src_rect.t;
+			
+			DrawBitmap(bitmap, { x, y }, { w, h }, { ox, oy }, {});
+		}
+	}
+}
+
+
 void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, Vec2I pos, SizeI size, Vec2I offset, BlitOptions opts)
 {
 	for (int i = 0; i < size.h; i++)

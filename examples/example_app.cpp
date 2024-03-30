@@ -38,17 +38,17 @@ int Smol::Blit2D::ExampleApp::RunApp()
 }
 
 
-Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title) noexcept
+Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept
 {
 	// Define constants for our window styles
 	const DWORD style = WS_OVERLAPPEDWINDOW;
 	const DWORD ex_style = WS_EX_OVERLAPPEDWINDOW;
 	
 	// Request a client rect instead of a window rect
-	RECT rect{ 0, 0, 600, 400 };
+	RECT rect{ 0, 0, width, height };
 	AdjustWindowRectEx(&rect, style, false, ex_style);
-	int width = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
+	width = rect.right - rect.left;
+	height = rect.bottom - rect.top;
 	
 	// Create our window
 	hWnd = CreateWindowEx(
@@ -71,13 +71,11 @@ void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, std::function<const 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	
+	SetTimer(hWnd, 0, 1000 / 50, NULL);
+	
 	this->callback = std::move(callback);
-	auto& bitmap = *this->callback();
 	
-	SetTimer(hWnd, 0, 1000/50, NULL);
-	
-	asdf->Release();
-	rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
+	UpdateBitmapTarget(*this->callback());
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
@@ -122,15 +120,16 @@ LRESULT Smol::Blit2D::ExampleApp::HandleWindowMessage(_In_ HWND hWnd, _In_ UINT 
 LRESULT Smol::Blit2D::ExampleApp::HandleCreateMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
 	RECT rect; GetWindowRect(hWnd, &rect);
+	auto size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
 	
 	DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&direct_write_factory));
 	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &direct_2d_factory);
 	
-	direct_2d_factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hWnd, D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top)), &rt);
+	direct_2d_factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hWnd, size), &rt);
 	direct_write_factory->CreateTextFormat(_T("Arial"), NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24.0f, _T("en"), &text_format);
 	rt->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &brush);
 	
-	if (auto result = rt->CreateBitmap(D2D1::SizeU(300, 200), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf); !SUCCEEDED(result))
+	if (auto result = rt->CreateBitmap(size, D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &bitmap_target); !SUCCEEDED(result))
 	{ MessageBox(NULL, L"Could not create bitmap", NULL, 0); }
 	
 	return 0;
@@ -155,12 +154,8 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 
 LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
-	// auto& bitmap = *callback();
-	
-	// asdf->Release();
-	// rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
+	// UpdateBitmapTarget(*callback());
 	// RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
-	
 	return 0;
 }
 
@@ -173,20 +168,33 @@ LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT m
 	rt->BeginDraw();
 	rt->Clear(D2D1::ColorF(D2D1::ColorF::Blue));
 	
-	// Draw a bitmap
+	// Draw our bitmap target bitmap
 	auto size = rt->GetSize();
-	rt->DrawBitmap(asdf, D2D1::RectF(0, 0, size.width, size.height), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-	
-	// Draw some text
-	// std::wstring_view greeting = L"Hello, Windows desktop!";
-	// auto size = rt->GetSize();
-	// rt->DrawTextW(greeting.data(), (int)greeting.size(), text_format, D2D1::RectF(0, 0, size.width, size.height), brush);
+	rt->DrawBitmap(bitmap_target, D2D1::RectF(0, 0, size.width, size.height), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 	
 	// End drawing our frame
 	rt->EndDraw();
 	EndPaint(hWnd, &ps);
 	
 	return 0;
+}
+
+
+void Smol::Blit2D::ExampleApp::UpdateBitmapTarget(const Bitmap& bitmap)
+{
+	auto target_size = bitmap_target->GetPixelSize();
+	auto bitmap_size = D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight());
+	
+	if (target_size == bitmap_size)
+	{
+		bitmap_target->CopyFromMemory(NULL, &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth());
+	}
+	else
+	{
+		bitmap_target->Release();
+		auto props = D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE));
+		rt->CreateBitmap(bitmap_size, &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), props, &bitmap_target);
+	}
 }
 
 
