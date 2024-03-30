@@ -144,6 +144,26 @@ void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const RectI& sourc
 }
 
 
+void Smol::Blit2D::Renderer::DrawTile(const Bitmap& bitmap, const Tileset& tileset, tileidx_t index, const Vec2I& pos, BlitOptions opts)
+{
+	auto tsize = target->GetSize();
+	auto src_rect = tileset.GetSourceRect(index);
+	auto src_size = src_rect.GetSize();
+	
+	if (pos.x <= -src_size.w || pos.x >= tsize.w || pos.y <= -src_size.h || pos.y >= tsize.h)
+	{ return; }
+	
+	int x = std::max<int>(0, pos.x);
+	int y = std::max<int>(0, pos.y);
+	int w = std::min<int>({ src_size.w, pos.x + src_size.w, tsize.w - pos.x });
+	int h = std::min<int>({ src_size.h, pos.y + src_size.h, tsize.h - pos.y });
+	int ox = (pos.x < 0) ? src_rect.l + src_size.w - w : src_rect.l;
+	int oy = (pos.y < 0) ? src_rect.t + src_size.h - h : src_rect.t;
+	
+	DrawBitmap(bitmap, { x, y }, { w, h }, { ox, oy }, opts);
+}
+
+
 void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, Vec2I pos, SizeI size, Vec2I offset, BlitOptions opts)
 {
 	for (int i = 0; i < size.h; i++)

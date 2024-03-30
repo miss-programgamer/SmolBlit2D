@@ -35,6 +35,24 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	renderer.DrawPoint({ 1, 5 });
 	renderer.DrawPoint({ 6, 5 });
 	
+	// Create a simple tileset bitmap
+	Bitmap ground_tiles(16, 16);
+	renderer.SetTarget(&ground_tiles);
+	renderer.SetColor(ColorName::Black);
+	renderer.DrawFill();
+	// -- grass tile
+	renderer.SetColor(ColorName::Green);
+	renderer.DrawRect({{ 8, 0 }, { 8, 8 }});
+	renderer.SetColor({ 0.5f, 1, 0.5f, 1 });
+	renderer.DrawStride({ 8, 0 }, 8);
+	// -- rock tile
+	renderer.SetColor({ 0.5f });
+	renderer.DrawRect({{ 0, 8 }, { 8, 8 }});
+	renderer.SetColor({ 0.75f });
+	renderer.DrawStride({ 0, 8 }, 8);
+	
+	Tileset ground_tileset({ 2, 2 }, { 8, 8 });
+	
 	// Create example app
 	ExampleApp example_app(hInstance, L"Example 1");
 	
@@ -42,7 +60,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{ return ErrorMessageBox(L"Failed to create main window", 1); }
 	
 	// Show main window
-	example_app.ShowMainWindow(nCmdShow, renderer.GetMainTarget(), [&renderer, &smiley, &x]() -> const Bitmap*
+	example_app.ShowMainWindow(nCmdShow, renderer.GetMainTarget(), [&renderer, &smiley, &x, &ground_tiles, &ground_tileset]() -> const Bitmap*
 	{
 		// Process our frame logic
 		x += 2;
@@ -64,6 +82,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		renderer.DrawBitmap(smiley, { 4, 0, 8, 4 }, { 75, 60 });
 		renderer.DrawBitmap(smiley, { 4, 4, 8, 8 }, { 75, 65 });
 		renderer.DrawBitmap(smiley, { 0, 4, 4, 8 }, { 70, 65 });
+		
+		// Draw some tiles
+		renderer.DrawTile(ground_tiles, ground_tileset, 1, { 24, 24 });
+		renderer.DrawTile(ground_tiles, ground_tileset, 1, { 32, 24 });
+		renderer.DrawTile(ground_tiles, ground_tileset, 1, { 40, 24 });
+		renderer.DrawTile(ground_tiles, ground_tileset, 2, { 24, 32 });
+		renderer.DrawTile(ground_tiles, ground_tileset, 2, { 32, 32 });
+		renderer.DrawTile(ground_tiles, ground_tileset, 2, { 40, 32 });
 		
 		// Draw a moving smiley
 		renderer.DrawBitmap(smiley, { x, 40 });

@@ -9,6 +9,8 @@
 #include "color.hpp"
 #include "palette.hpp"
 #include "pal_bitmap.hpp"
+#include "tileset.hpp"
+#include "tilemap.hpp"
 #include "bitmap.hpp"
 
 
@@ -78,6 +80,11 @@ namespace Smol::Blit2D
 		
 		// Draw a bitmap section at the given position.
 		void DrawBitmap(const Bitmap& bitmap, const RectI& source, const Vec2I& pos, BlitOptions opts = {});
+		
+		// Draw a tile from a tilemap at the given position.
+		void DrawTile(const Bitmap& bitmap, const Tileset& tileset, tileidx_t index, const Vec2I& pos, BlitOptions opts = {});
+		
+		// void DrawTilemap();
 		
 		
 	 private:
