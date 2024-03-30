@@ -3,6 +3,7 @@
 
 
 #include <cstdint>
+#include <memory>
 
 #include "vec2.hpp"
 #include "size.hpp"
@@ -26,24 +27,26 @@ namespace Smol::Blit2D
 			size{ 0, 0 }
 		{}
 		
-		// Construct a bitmap of the given dimensions.
-		inline Bitmap(uint16_t width, uint16_t height) noexcept:
-			colors(new Color[width * height]),
-			size{ width, height }
-		{}
+		// Copy-construct a bitmap.
+		Bitmap(const Bitmap& other);
+		
+		// Move-construct a bitmap
+		Bitmap(Bitmap&& other) noexcept;
+		
+		// Copy-assign a bitmap.
+		Bitmap& operator=(const Bitmap& other);
+		
+		// Move-assign a bitmap.
+		Bitmap& operator=(Bitmap&& other);
 		
 		// Construct a bitmap of the given dimensions.
-		inline Bitmap(Size<uint16_t> size) noexcept:
-			colors(new Color[size.w * size.h]),
-			size(size)
-		{}
+		Bitmap(uint16_t width, uint16_t height) noexcept;
+		
+		// Construct a bitmap of the given dimensions.
+		Bitmap(Size<uint16_t> size) noexcept;
 		
 		// Destruct this bitmap.
-		inline ~Bitmap()
-		{
-			if (colors != nullptr)
-			{ delete[] colors; }
-		}
+		~Bitmap();
 		
 		
 		// Get a pixel at the given point in this bitmap.

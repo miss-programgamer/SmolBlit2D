@@ -10,6 +10,11 @@ namespace Smol::Blit2D
 	{
 		T w;
 		T h;
+		
+		
+		// Get the area of this size.
+		constexpr T GetArea() const
+		{ return w * h; }
 	};
 	
 	

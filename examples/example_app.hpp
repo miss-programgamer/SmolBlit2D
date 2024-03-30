@@ -2,12 +2,15 @@
 #define SMOL_BLIT2D_EXAMPLE_APP_DEFINED
 
 
+#include <optional>
 #include <string_view>
 #include <functional>
+
 #include <windows.h>
 #include <tchar.h>
 #include <d2d1.h>
 #include <dwrite.h>
+#undef LoadBitmap
 
 #include <smol/blit2d/bitmap.hpp>
 
@@ -43,7 +46,7 @@ namespace Smol::Blit2D
 		
 		ExampleApp(HINSTANCE hInstance, std::wstring_view title) noexcept;
 		
-		void ShowMainWindow(int nCmdShow, const Bitmap& bitmap, std::function<const Bitmap*()> callback);
+		void ShowMainWindow(int nCmdShow, std::function<const Bitmap*()> callback);
 		
 		static LRESULT WindowProc(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
@@ -61,6 +64,9 @@ namespace Smol::Blit2D
 		
 		inline operator bool()
 		{ return hWnd; }
+		
+		
+		static std::optional<Bitmap> LoadBitmap(const char* filename);
 	};
 }
 

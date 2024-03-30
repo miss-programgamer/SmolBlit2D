@@ -1,4 +1,6 @@
 #include "example_app.hpp"
+#include <array>
+#include <fstream>
 
 
 bool Smol::Blit2D::ExampleApp::RegisterMainWindowClass(HINSTANCE hInstance)
@@ -64,12 +66,13 @@ Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view titl
 }
 
 
-void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, const Bitmap& bitmap, std::function<const Bitmap*()> callback)
+void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, std::function<const Bitmap*()> callback)
 {
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	
 	this->callback = std::move(callback);
+	auto& bitmap = *this->callback();
 	
 	SetTimer(hWnd, 0, 1000/50, NULL);
 	
@@ -152,11 +155,11 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 
 LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
-	auto& bitmap = *callback();
+	// auto& bitmap = *callback();
 	
-	asdf->Release();
-	rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
-	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+	// asdf->Release();
+	// rt->CreateBitmap(D2D1::SizeU(bitmap.GetWidth(), bitmap.GetHeight()), &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE)), &asdf);
+	// RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 	
 	return 0;
 }
@@ -184,4 +187,95 @@ LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT m
 	EndPaint(hWnd, &ps);
 	
 	return 0;
+}
+
+
+std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadBitmap(const char* filename)
+{
+	// open bitmap file
+	std::ifstream file(filename, std::ios::binary);
+	
+	// load file header
+	std::array<unsigned char, 14> file_header;
+	
+	for (auto& c : file_header)
+	{ c = file.get(); }
+	
+	// find file size
+	uint32_t file_size;
+	memcpy(&file_size, &file_header[2], 4);
+	
+	// find pixel data offset
+	uint32_t pixel_data_index;
+	memcpy(&pixel_data_index, &file_header[10], 4);
+	
+	// load bitmap header (different from the file header)
+	std::array<unsigned char, 40> bitmap_header;
+	
+	for (auto& c : bitmap_header)
+	{ c = file.get(); }
+	
+	// fine size of bitmap header (should be 40)
+	uint32_t bitmap_header_size;
+	memcpy(&bitmap_header_size, &bitmap_header[0], 4);
+	
+	// find image size
+	int32_t width, height, area;
+	memcpy(&width, &bitmap_header[4], 4);
+	memcpy(&height, &bitmap_header[8], 4);
+	area = width * height;
+	
+	// find color depth
+	int16_t bit_depth;
+	memcpy(&bit_depth, &bitmap_header[14], 2);
+	
+	// find compression method
+	uint32_t compression_method;
+	memcpy(&compression_method, &bitmap_header[16], 4);
+	
+	// find palette size
+	uint32_t palette_size;
+	memcpy(&palette_size, &bitmap_header[32], 4);
+	
+	if (palette_size == 0)
+	{ palette_size = 256; }
+	
+	if (bit_depth <= 8) // the image uses a color palette
+	{
+		// create and fill color palette
+		Color* palette_colors = new Color[palette_size];
+		
+		for (uint32_t i = 0; i < palette_size; i++)
+		{
+			auto& color = palette_colors[i];
+			color.b = (float)file.get() / 255.0f;
+			color.g = (float)file.get() / 255.0f;
+			color.r = (float)file.get() / 255.0f;
+			color.a = (float)file.get() / 255.0f;
+		}
+		
+		// create and fill bitmap
+		Bitmap bitmap(width, height);
+		auto colors = &bitmap.At({ 0, 0 });
+		
+		for (int i = 0; i < area; i++)
+		{
+			auto x = i % width;
+			auto y = height - i / width - 1;
+			
+			if (unsigned char index = file.get(); index < palette_size)
+			{ bitmap.At({ x, y }) = palette_colors[index]; }
+		}
+		
+		// delete our color palette
+		delete[] palette_colors;
+		
+		// return complete bitmap
+		return bitmap;
+	}
+	else // the image uses colors directly
+	{
+		// return nothing for now
+		return std::nullopt;
+	}
 }
