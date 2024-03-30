@@ -7,17 +7,9 @@ namespace Smol::Blit2D
 	// Color names
 	enum class ColorName
 	{
-		Empty,
-		Black,
-		White,
-		
-		Red,
-		Green,
-		Blue,
-		
-		Yellow,
-		Magenta,
-		Cyan,
+		Empty,  Black,   White,
+		Red,    Green,   Blue,
+		Yellow, Magenta, Cyan,
 	};
 	
 	
