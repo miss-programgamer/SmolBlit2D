@@ -154,8 +154,8 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 
 LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
-	// UpdateBitmapTarget(*callback());
-	// RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+	UpdateBitmapTarget(*callback());
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 	return 0;
 }
 
