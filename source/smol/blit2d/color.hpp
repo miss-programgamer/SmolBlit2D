@@ -89,6 +89,10 @@ namespace Smol::Blit2D
 		// Get an opaque copy of this color.
 		constexpr Color GetOpaque() const
 		{ return { r, g, b, 1.0f }; }
+		
+		
+		// Blend a color overlaid on a base color.
+		static Color Blend(const Color& other, const Color& base);
 	};
 }
 

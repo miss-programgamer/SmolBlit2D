@@ -5,13 +5,15 @@
 
 Smol::Blit2D::Renderer::Renderer(int width, int height) noexcept:
 	main_target(width, height),
-	target(&main_target)
+	target(&main_target),
+	mode(BlitMode::Replace)
 {}
 
 
 Smol::Blit2D::Renderer::Renderer(SizeI size) noexcept:
 	main_target(size.w, size.h),
-	target(&main_target)
+	target(&main_target),
+	mode(BlitMode::Replace)
 {}
 
 
@@ -30,6 +32,12 @@ void Smol::Blit2D::Renderer::SetPalette(Palette* palette)
 void Smol::Blit2D::Renderer::SetColor(const Color& color)
 {
 	this->color = color;
+}
+
+
+void Smol::Blit2D::Renderer::SetBlitMode(BlitMode mode)
+{
+	this->mode = mode;
 }
 
 
@@ -205,25 +213,42 @@ void Smol::Blit2D::Renderer::DrawTilemap(const Bitmap& bitmap, const Tileset& ti
 
 void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, Vec2I pos, SizeI size, Vec2I offset, BlitOptions opts)
 {
-	for (int i = 0; i < size.h; i++)
+	switch (mode)
 	{
-		if (opts.flipy)
-		{
-			auto ptr = &bitmap.At({ offset.x, offset.y + size.h - 1 - i });
-			
-			if (opts.flipx)
-			{ std::reverse_copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
-			else
-			{ std::copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
-		}
-		else
-		{
-			auto ptr = &bitmap.At({ offset.x, offset.y + i });
-			
-			if (opts.flipx)
-			{ std::reverse_copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
-			else
-			{ std::copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
-		}
+		case BlitMode::Replace:
+			for (int i = 0; i < size.h; i++)
+			{
+				if (opts.flipy)
+				{
+					auto ptr = &bitmap.At({ offset.x, offset.y + size.h - 1 - i });
+					
+					if (opts.flipx)
+					{ std::reverse_copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
+					else
+					{ std::copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
+				}
+				else
+				{
+					auto ptr = &bitmap.At({ offset.x, offset.y + i });
+					
+					if (opts.flipx)
+					{ std::reverse_copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
+					else
+					{ std::copy(ptr, ptr + size.w, &target->At({ pos.x, pos.y + i })); }
+				}
+			}
+			break;
+		
+		case BlitMode::Blend:
+			for (int y = 0; y < size.h; y++)
+			{
+				for (int x = 0; x < size.w; x++)
+				{
+					auto& base = target->At({ pos.x + x, pos.y + y });
+					const auto& other = bitmap.At({ offset.x + x, offset.y + y });
+					base = Color::Blend(base, other);
+				}
+			}
+			break;
 	}
 }

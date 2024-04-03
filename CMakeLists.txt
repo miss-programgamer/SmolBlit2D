@@ -13,6 +13,7 @@ set(SMOL_BLIT2D_SOURCES
 	"./source/smol/blit2d/size.hpp"
 	"./source/smol/blit2d/rect.hpp"
 	"./source/smol/blit2d/color.hpp"
+	"./source/smol/blit2d/color.cpp"
 	"./source/smol/blit2d/palette.hpp"
 	"./source/smol/blit2d/pal_bitmap.hpp"
 	"./source/smol/blit2d/pal_bitmap.cpp"

@@ -67,11 +67,16 @@ namespace Smol::Blit2D
 		
 		
 	 private:
+		// Write the contents of a given bitmap to the target bitmap.
 		void UpdateBitmapTarget(const Bitmap& bitmap);
 		
 		
 	 public:
-		static std::optional<Bitmap> LoadBitmap(const char* filename);
+		// Load a bitmap from a .bmp file.
+		static std::optional<Bitmap> LoadBMP(const char* filename);
+		
+		// Load a bitmap from a .dds file.
+		static std::optional<Bitmap> LoadDDS(const char* filename);
 	};
 }
 

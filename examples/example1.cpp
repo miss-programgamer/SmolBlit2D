@@ -27,10 +27,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Renderer renderer(160, 120);
 	
 	// Load a smiley bitmap
-	Bitmap smiley = *ExampleApp::LoadBitmap("assets/smiley.bmp");
+	Bitmap smiley = *ExampleApp::LoadDDS("assets/smiley.dds");
 	
 	// Load a ground tileset bitmap
-	Bitmap ground = *ExampleApp::LoadBitmap("assets/ground.bmp");
+	Bitmap ground = *ExampleApp::LoadBMP("assets/ground.bmp");
 	Tileset ground_tileset({ 2, 2 }, { 8, 8 });
 	
 	// Create a tilemap made of ground tiles
@@ -62,7 +62,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		renderer.SetColor({ 0.4f, 0.5f, 1 });
 		renderer.DrawFill();
 		
-		// Draw some things to the main target
+		// Draw a tilemap
+		renderer.SetBlitMode(BlitMode::Replace);
+		renderer.DrawTilemap(ground, ground_tileset, tilemap, { 0, 0 });
+		
+		// Draw some smileys to the main target
+		renderer.SetBlitMode(BlitMode::Blend);
 		renderer.DrawBitmap(smiley, { -2, -2 });
 		renderer.DrawBitmap(smiley, { 65, 40 }, { false, false });
 		renderer.DrawBitmap(smiley, { 85, 30 }, { true, false });
@@ -74,9 +79,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		renderer.DrawBitmap(smiley, { 4, 0, 8, 4 }, { 75, 60 });
 		renderer.DrawBitmap(smiley, { 4, 4, 8, 8 }, { 75, 65 });
 		renderer.DrawBitmap(smiley, { 0, 4, 4, 8 }, { 70, 65 });
-		
-		// Draw a tilemap
-		renderer.DrawTilemap(ground, ground_tileset, tilemap, { 0, 0 });
 		
 		// Draw a moving smiley
 		renderer.DrawBitmap(smiley, { x, 40 });

@@ -16,6 +16,14 @@
 
 namespace Smol::Blit2D
 {
+	// How pixels are mixed during drawing.
+	enum class BlitMode
+	{
+		Replace = 0,
+		Blend   = 1,
+	};
+	
+	
 	// Option values relevant to drawing bitmaps.
 	struct BlitOptions
 	{
@@ -35,6 +43,8 @@ namespace Smol::Blit2D
 		
 		Color color;
 		
+		BlitMode mode;
+		
 		
 	 public:
 		// Construct a renderer.
@@ -52,6 +62,9 @@ namespace Smol::Blit2D
 		
 		// Set the color used to tint bitmaps and primitives.
 		void SetColor(const Color& color);
+		
+		// Set the color blending mode for this renderer.
+		void SetBlitMode(BlitMode mode);
 		
 		
 		// Convert a palette bitmap to a bitmap using our palette.
