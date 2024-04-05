@@ -5,7 +5,7 @@
 #include <cmath>
 
 
-namespace Smol
+namespace Smol::Core2D
 {
 	// A 2D vector represented by values on two axes.
 	template<typename T>
@@ -95,10 +95,6 @@ namespace Smol
 	template<typename T>
 	constexpr Vec2<T>& operator/(Vec2<T>& lhs, const T& rhs)
 	{ lhs = lhs / rhs; return lhs; }
-	
-	
-	using Vec2F = Vec2<float>;
-	using Vec2I = Vec2<int>;
 }
 
 

@@ -68,7 +68,7 @@ Smol::Blit2D::Bitmap::Bitmap(uint16_t width, uint16_t height) noexcept:
 {}
 
 
-Smol::Blit2D::Bitmap::Bitmap(Size<uint16_t> size) noexcept:
+Smol::Blit2D::Bitmap::Bitmap(SizeU16 size) noexcept:
 	colors(new Color[size.w * size.h]),
 	size(size)
 {}

@@ -6,7 +6,7 @@
 #include "size.hpp"
 
 
-namespace Smol
+namespace Smol::Core2D
 {
 	// A 2D rectangle represented by its outer bounds.
 	template<typename T>
@@ -71,10 +71,6 @@ namespace Smol
 		constexpr Vec2<T> GetMax() const
 		{ return { r, b }; }
 	};
-	
-	
-	using RectF = Rect<float>;
-	using RectI = Rect<int>;
 }
 
 

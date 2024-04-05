@@ -2,7 +2,7 @@
 #define SMOL_CORE2D_SIZE_DEFINED
 
 
-namespace Smol
+namespace Smol::Core2D
 {
 	// A 2D size represented by two component values.
 	template<typename T>
@@ -19,10 +19,6 @@ namespace Smol
 		constexpr T GetArea() const
 		{ return w * h; }
 	};
-	
-	
-	using SizeI = Size<int>;
-	using SizeF = Size<float>;
 }
 
 

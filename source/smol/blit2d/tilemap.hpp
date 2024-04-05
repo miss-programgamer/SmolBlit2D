@@ -5,13 +5,13 @@
 #include <cstdint>
 #include <memory>
 
-#include <smol/core2d/vec2.hpp>
-#include <smol/core2d/size.hpp>
+#include <smol/core2d.hpp>
 
 
 namespace Smol::Blit2D
 {
 	using tileidx_t = int;
+	using SizeU16 = Core2D::Size<uint16_t>;
 	
 	
 	// Contains a grid of tile indices.
@@ -19,7 +19,7 @@ namespace Smol::Blit2D
 	{
 		tileidx_t* tiles;
 		
-		Size<uint16_t> size;
+		SizeU16 size;
 		
 		
 	 public:
@@ -36,7 +36,7 @@ namespace Smol::Blit2D
 		{ std::fill(tiles, tiles + (width * height), 0); }
 		
 		// Construct a tilemap of the given dimensions.
-		inline Tilemap(Size<uint16_t> size) noexcept:
+		inline Tilemap(SizeU16 size) noexcept:
 			tiles(new tileidx_t[size.w * size.h]),
 			size(size)
 		{ std::fill(tiles, tiles + (size.w * size.h), 0); }

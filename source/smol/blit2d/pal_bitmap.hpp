@@ -2,19 +2,21 @@
 #define SMOL_BLIT2D_PAL_BITMAP_DEFINED
 
 
-#include <smol/core2d/vec2.hpp>
-#include <smol/core2d/size.hpp>
+#include <smol/core2d.hpp>
 #include "palette.hpp"
 
 
 namespace Smol::Blit2D
 {
+	using SizeU16 = Core2D::Size<uint16_t>;
+	
+	
 	// A bitmap where pixels are indices into a palette.
 	class PalBitmap
 	{
 		palidx_t* indices;
 		
-		Size<uint16_t> size;
+		SizeU16 size;
 		
 		
 	 public:
@@ -31,7 +33,7 @@ namespace Smol::Blit2D
 		{}
 		
 		// Construct a bitmap of the given dimensions.
-		inline PalBitmap(Size<uint16_t> size) noexcept:
+		inline PalBitmap(SizeU16 size) noexcept:
 			indices(new palidx_t[size.w * size.h]),
 			size(size)
 		{}

@@ -5,19 +5,21 @@
 #include <cstdint>
 #include <memory>
 
-#include <smol/core2d/vec2.hpp>
-#include <smol/core2d/size.hpp>
+#include <smol/core2d.hpp>
 #include "color.hpp"
 
 
 namespace Smol::Blit2D
 {
+	using SizeU16 = Smol::Core2D::Size<uint16_t>;
+	
+	
 	// A bitmap where pixels are full colors.
 	class Bitmap
 	{
 		Color* colors;
 		
-		Size<uint16_t> size;
+		SizeU16 size;
 		
 		
 	 public:
@@ -43,7 +45,7 @@ namespace Smol::Blit2D
 		Bitmap(uint16_t width, uint16_t height) noexcept;
 		
 		// Construct a bitmap of the given dimensions.
-		Bitmap(Size<uint16_t> size) noexcept;
+		Bitmap(SizeU16 size) noexcept;
 		
 		// Destruct this bitmap.
 		~Bitmap();
