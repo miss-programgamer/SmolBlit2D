@@ -51,7 +51,7 @@ namespace Smol::Core2D
 		{ return l <= pos.x && pos.x < r && t <= pos.y && pos.y < b; }
 		
 		// Check whether this rect overlaps another.
-		constexpr bool Contains(const Rect<T>& other) const
+		constexpr bool Overlaps(const Rect<T>& other) const
 		{ return !(l >= other.r || other.l >= r || t >= other.b || other.t >= b); }
 		
 		
