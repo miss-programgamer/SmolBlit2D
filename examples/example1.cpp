@@ -8,7 +8,7 @@ constexpr tileidx_t DirtTile = 2;
 constexpr tileidx_t RockTile = 3;
 
 
-// Main app
+// Example 1 main app class
 class App : public ExampleApp
 {
 	Renderer renderer;
@@ -22,6 +22,8 @@ class App : public ExampleApp
 	Tilemap tilemap;
 	
 	int time = 0;
+	
+	int x = 0;
 	
 	
  public:
@@ -52,10 +54,16 @@ class App : public ExampleApp
 	
  protected:
 	// Update function overriden by us.
-	void Update() override
+	void Update(const Input& input) override
 	{
 		// Process our frame logic
 		++time;
+		
+		if (Input::IsBtnDown(input.mouse_l_btn))
+		{ x -= 1; }
+		
+		if (Input::IsBtnDown(input.mouse_r_btn))
+		{ x += 1; }
 	}
 	
 	// Draw function overriden by us.
@@ -87,6 +95,9 @@ class App : public ExampleApp
 		// Draw a moving smiley
 		renderer.DrawBitmap(smiley, { time, 40 });
 		renderer.DrawBitmap(smiley, { 45, 45 + (((time % 60) >= 30) ? 0 : 16) });
+		
+		// Draw player
+		renderer.DrawBitmap(smiley, { x, 60 });
 		
 		// Return the result of drawing our frame
 		return renderer.GetMainTarget();

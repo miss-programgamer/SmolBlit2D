@@ -43,7 +43,14 @@ target_link_libraries(SmolBlit2D PUBLIC SmolCore2D)
 
 # Add example targets
 if (SMOL_BLIT2D_BUILD_EXAMPLES AND MSVC)
-	add_library(SmolBlit2DExampleApp STATIC "examples/example_app.hpp" "examples/example_app.cpp")
+	set(SMOL_BLIT2D_EXAMPLES_SOURCES
+		"examples/input.hpp"
+		"examples/input.cpp"
+		"examples/example_app.hpp"
+		"examples/example_app.cpp"
+	)
+	
+	add_library(SmolBlit2DExampleApp STATIC ${SMOL_BLIT2D_EXAMPLES_SOURCES})
 	target_link_libraries(SmolBlit2DExampleApp d2d1 dwrite SmolBlit2D)
 	target_compile_definitions(SmolBlit2DExampleApp PUBLIC UNICODE _UNICODE)
 	

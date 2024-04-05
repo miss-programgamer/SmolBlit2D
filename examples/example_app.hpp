@@ -1,5 +1,5 @@
-#ifndef SMOL_BLIT2D_EXAMPLE_APP_DEFINED
-#define SMOL_BLIT2D_EXAMPLE_APP_DEFINED
+#ifndef SMOL_BLIT2D_EXAMPLES_EXAMPLE_APP_DEFINED
+#define SMOL_BLIT2D_EXAMPLES_EXAMPLE_APP_DEFINED
 
 
 #include <optional>
@@ -13,6 +13,8 @@
 #undef LoadBitmap
 
 #include <smol/blit2d/bitmap.hpp>
+
+#include "input.hpp"
 
 
 namespace Smol::Blit2D
@@ -45,6 +47,8 @@ namespace Smol::Blit2D
 		
 		ID2D1Bitmap* bitmap_target;
 		
+		Input input;
+		
 		int time_passed;
 		
 		int time_target;
@@ -70,7 +74,7 @@ namespace Smol::Blit2D
 		
 	 protected:
 		// Update function to be overriden by users.
-		virtual void Update() = 0;
+		virtual void Update(const Input& input) = 0;
 		
 		// Draw function to be overriden by users.
 		virtual const Bitmap& Draw() = 0;
@@ -86,6 +90,8 @@ namespace Smol::Blit2D
 		LRESULT HandleDestroyMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
 		LRESULT HandleSizeMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
+		
+		LRESULT HandleMouseMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
 		LRESULT HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
@@ -105,4 +111,4 @@ namespace Smol::Blit2D
 }
 
 
-#endif // SMOL_BLIT2D_EXAMPLE_APP_DEFINED
+#endif // SMOL_BLIT2D_EXAMPLES_EXAMPLE_APP_DEFINED

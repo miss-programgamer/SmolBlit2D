@@ -46,6 +46,7 @@ bool Smol::Blit2D::ExampleApp::RegisterWindowClass(HINSTANCE hInstance)
 
 
 Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept:
+	input{},
 	time_target(16)
 {
 	// Define constants for our window styles
@@ -79,7 +80,7 @@ void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow)
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	
-	UpdateBitmapTarget((Update(), Draw()));
+	UpdateBitmapTarget(Draw());
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
@@ -108,6 +109,15 @@ LRESULT Smol::Blit2D::ExampleApp::HandleWindowMessage(_In_ HWND hWnd, _In_ UINT 
 		
 		case WM_SIZE:
 			return HandleSizeMessage(hWnd, message, wParam, lParam);
+		
+		case WM_MOUSEMOVE:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+			return HandleMouseMessage(hWnd, message, wParam, lParam);
 		
 		case WM_TIMER:
 			return HandleTimerMessage(hWnd, message, wParam, lParam);
@@ -158,6 +168,16 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 }
 
 
+LRESULT Smol::Blit2D::ExampleApp::HandleMouseMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+	input.mouse_l_btn = (input.mouse_l_btn & 0b10) | ((wParam & MK_LBUTTON) ? 0b01 : 0b00);
+	input.mouse_m_btn = (input.mouse_m_btn & 0b10) | ((wParam & MK_MBUTTON) ? 0b01 : 0b00);
+	input.mouse_r_btn = (input.mouse_r_btn & 0b10) | ((wParam & MK_RBUTTON) ? 0b01 : 0b00);
+	input.mouse_pos = { LOWORD(lParam), HIWORD(lParam) };
+	return 0;
+}
+
+
 LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 { return 0; }
 
@@ -173,7 +193,9 @@ LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT m
 	
 	if ((time_passed / time_target) > 0)
 	{
-		UpdateBitmapTarget((Update(), Draw()));
+		UpdateBitmapTarget((Update(input), Draw()));
+		input.Cycle();
+		
 		time_acc += 2;
 		next_target = ((time_acc / 3) > 0) ? 17 : 16;
 		time_acc %= 3;
