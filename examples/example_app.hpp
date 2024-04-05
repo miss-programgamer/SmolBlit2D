@@ -38,6 +38,14 @@ namespace Smol::Blit2D
 		
 		std::function<const Bitmap*()> callback;
 		
+		int time_passed;
+		
+		int time_target;
+		
+		int time_acc;
+		
+		ULONGLONG prev_time;
+		
 		
 	 public:
 		static bool RegisterMainWindowClass(HINSTANCE hInstance);

@@ -38,7 +38,8 @@ int Smol::Blit2D::ExampleApp::RunApp()
 }
 
 
-Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept
+Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept:
+	time_target(16)
 {
 	// Define constants for our window styles
 	const DWORD style = WS_OVERLAPPEDWINDOW;
@@ -70,8 +71,6 @@ void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, std::function<const 
 {
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
-	
-	SetTimer(hWnd, 0, 1000 / 50, NULL);
 	
 	this->callback = std::move(callback);
 	
@@ -119,6 +118,8 @@ LRESULT Smol::Blit2D::ExampleApp::HandleWindowMessage(_In_ HWND hWnd, _In_ UINT 
 
 LRESULT Smol::Blit2D::ExampleApp::HandleCreateMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
+	prev_time = GetTickCount64();
+	
 	RECT rect; GetWindowRect(hWnd, &rect);
 	auto size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
 	
@@ -153,15 +154,30 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 
 
 LRESULT Smol::Blit2D::ExampleApp::HandleTimerMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
-{
-	UpdateBitmapTarget(*callback());
-	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
-	return 0;
-}
+{ return 0; }
 
 
 LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
+	// Update game state if needed
+	auto time = GetTickCount64();
+	auto delta = time - prev_time;
+	int next_target = time_target;
+	
+	time_passed += delta;
+	
+	if ((time_passed / time_target) > 0 && callback)
+	{
+		UpdateBitmapTarget(*callback());
+		time_acc += 2;
+		next_target = ((time_acc / 3) > 0) ? 17 : 16;
+		time_acc %= 3;
+	}
+	
+	time_passed %= time_target;
+	time_target = next_target;
+	prev_time = time;
+	
 	// Begin drawing a frame
 	PAINTSTRUCT ps;
 	BeginPaint(hWnd, &ps);
@@ -175,6 +191,9 @@ LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT m
 	// End drawing our frame
 	rt->EndDraw();
 	EndPaint(hWnd, &ps);
+	
+	// Invalidate entire window, ensuring a repaint next frame
+	RedrawWindow(hWnd, NULL, NULL, RDW_INTERNALPAINT);
 	
 	return 0;
 }

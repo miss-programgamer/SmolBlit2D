@@ -82,6 +82,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		
 		// Draw a moving smiley
 		renderer.DrawBitmap(smiley, { x, 40 });
+		renderer.DrawBitmap(smiley, { 45, 45 + (((x % 60) >= 30) ? 0 : 16) });
 		
 		// Return the result of drawing our frame
 		return &renderer.GetMainTarget();
