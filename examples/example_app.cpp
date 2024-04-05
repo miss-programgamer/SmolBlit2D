@@ -3,7 +3,28 @@
 #include <fstream>
 
 
-bool Smol::Blit2D::ExampleApp::RegisterMainWindowClass(HINSTANCE hInstance)
+int Smol::Blit2D::ErrorMessageBox(const wchar_t* message, int error_code)
+{
+	MessageBoxW(NULL, message, NULL, MB_ICONERROR);
+	return error_code;
+}
+
+
+int Smol::Blit2D::StartMessageLoop()
+{
+	MSG msg;
+	
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	
+	return (int)msg.wParam;
+}
+
+
+bool Smol::Blit2D::ExampleApp::RegisterWindowClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
 	
@@ -21,20 +42,6 @@ bool Smol::Blit2D::ExampleApp::RegisterMainWindowClass(HINSTANCE hInstance)
 	wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
 	
 	return RegisterClassEx(&wcex);
-}
-
-
-int Smol::Blit2D::ExampleApp::RunApp()
-{
-	MSG msg;
-	
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	
-	return (int)msg.wParam;
 }
 
 
@@ -67,14 +74,12 @@ Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view titl
 }
 
 
-void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow, std::function<const Bitmap*()> callback)
+void Smol::Blit2D::ExampleApp::ShowMainWindow(int nCmdShow)
 {
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	
-	this->callback = std::move(callback);
-	
-	UpdateBitmapTarget(*this->callback());
+	UpdateBitmapTarget((Update(), Draw()));
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
@@ -166,9 +171,9 @@ LRESULT Smol::Blit2D::ExampleApp::HandlePaintMessage(_In_ HWND hWnd, _In_ UINT m
 	
 	time_passed += delta;
 	
-	if ((time_passed / time_target) > 0 && callback)
+	if ((time_passed / time_target) > 0)
 	{
-		UpdateBitmapTarget(*callback());
+		UpdateBitmapTarget((Update(), Draw()));
 		time_acc += 2;
 		next_target = ((time_acc / 3) > 0) ? 17 : 16;
 		time_acc %= 3;

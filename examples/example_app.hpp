@@ -17,6 +17,15 @@
 
 namespace Smol::Blit2D
 {
+	// 
+	int ErrorMessageBox(const wchar_t* message, int error_code = 1);
+	
+	
+	// 
+	int StartMessageLoop();
+	
+	
+	// 
 	class ExampleApp
 	{
 		static inline std::wstring_view szMainWindowClass = L"MainWindow";
@@ -36,8 +45,6 @@ namespace Smol::Blit2D
 		
 		ID2D1Bitmap* bitmap_target;
 		
-		std::function<const Bitmap*()> callback;
-		
 		int time_passed;
 		
 		int time_target;
@@ -48,14 +55,28 @@ namespace Smol::Blit2D
 		
 		
 	 public:
-		static bool RegisterMainWindowClass(HINSTANCE hInstance);
+		// Register example app window class.
+		static bool RegisterWindowClass(HINSTANCE hInstance);
 		
-		static int RunApp();
-		
+		// Construct an example app.
 		ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept;
 		
-		void ShowMainWindow(int nCmdShow, std::function<const Bitmap*()> callback);
+		// Show this example app's main window.
+		void ShowMainWindow(int nCmdShow);
 		
+		// Whether this app has been successfully initialized.
+		inline operator bool()
+		{ return hWnd; }
+		
+	 protected:
+		// Update function to be overriden by users.
+		virtual void Update() = 0;
+		
+		// Draw function to be overriden by users.
+		virtual const Bitmap& Draw() = 0;
+		
+		
+	 private:
 		static LRESULT WindowProc(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
 		LRESULT HandleWindowMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
@@ -70,11 +91,6 @@ namespace Smol::Blit2D
 		
 		LRESULT HandlePaintMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam);
 		
-		inline operator bool()
-		{ return hWnd; }
-		
-		
-	 private:
 		// Write the contents of a given bitmap to the target bitmap.
 		void UpdateBitmapTarget(const Bitmap& bitmap);
 		
