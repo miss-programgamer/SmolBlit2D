@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-Smol::Blit2D::RectI Smol::Blit2D::Tileset::GetSourceRect(tileidx_t index) const
+Smol::RectI Smol::Blit2D::Tileset::GetSourceRect(tileidx_t index) const
 {
 	if (index < 0 || index > (set_size.w * set_size.h))
 	{ throw std::out_of_range("tile index out of range in tileset"); }

@@ -4,8 +4,8 @@
 
 #include <cstdint>
 
-#include "vec2.hpp"
-#include "rect.hpp"
+#include <smol/core2d/vec2.hpp>
+#include <smol/core2d/rect.hpp>
 #include "color.hpp"
 #include "palette.hpp"
 #include "pal_bitmap.hpp"

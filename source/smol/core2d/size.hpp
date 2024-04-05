@@ -1,8 +1,8 @@
-#ifndef SMOL_BLIT2D_SIZE_DEFINED
-#define SMOL_BLIT2D_SIZE_DEFINED
+#ifndef SMOL_CORE2D_SIZE_DEFINED
+#define SMOL_CORE2D_SIZE_DEFINED
 
 
-namespace Smol::Blit2D
+namespace Smol
 {
 	// A 2D size represented by two component values.
 	template<typename T>
@@ -23,4 +23,4 @@ namespace Smol::Blit2D
 }
 
 
-#endif // SMOL_BLIT2D_SIZE_DEFINED
+#endif // SMOL_CORE2D_SIZE_DEFINED

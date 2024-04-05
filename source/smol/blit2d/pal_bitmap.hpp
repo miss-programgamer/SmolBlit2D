@@ -2,8 +2,8 @@
 #define SMOL_BLIT2D_PAL_BITMAP_DEFINED
 
 
-#include "vec2.hpp"
-#include "size.hpp"
+#include <smol/core2d/vec2.hpp>
+#include <smol/core2d/size.hpp>
 #include "palette.hpp"
 
 

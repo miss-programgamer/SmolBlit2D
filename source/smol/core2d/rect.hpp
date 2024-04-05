@@ -1,14 +1,14 @@
-#ifndef SMOL_BLIT2D_RECT_DEFINED
-#define SMOL_BLIT2D_RECT_DEFINED
+#ifndef SMOL_CORE2D_RECT_DEFINED
+#define SMOL_CORE2D_RECT_DEFINED
 
 
 #include "vec2.hpp"
 #include "size.hpp"
 
 
-namespace Smol::Blit2D
+namespace Smol
 {
-	// A rectangle represented by its outer bounds.
+	// A 2D rectangle represented by its outer bounds.
 	template<typename T>
 	struct Rect
 	{
@@ -45,4 +45,4 @@ namespace Smol::Blit2D
 }
 
 
-#endif // SMOL_BLIT2D_RECT_DEFINED
+#endif // SMOL_CORE2D_RECT_DEFINED

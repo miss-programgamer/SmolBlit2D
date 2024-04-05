@@ -2,9 +2,9 @@
 #define SMOL_BLIT2D_TILESET_DEFINED
 
 
-#include "vec2.hpp"
-#include "size.hpp"
-#include "rect.hpp"
+#include <smol/core2d/vec2.hpp>
+#include <smol/core2d/size.hpp>
+#include <smol/core2d/rect.hpp>
 
 
 namespace Smol::Blit2D

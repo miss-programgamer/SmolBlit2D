@@ -1,8 +1,8 @@
-#ifndef SMOL_BLIT2D_VEC2_DEFINED
-#define SMOL_BLIT2D_VEC2_DEFINED
+#ifndef SMOL_CORE2D_VEC2_DEFINED
+#define SMOL_CORE2D_VEC2_DEFINED
 
 
-namespace Smol::Blit2D
+namespace Smol
 {
 	// A 2D vector represented by components on two axes.
 	template<typename T>
@@ -18,4 +18,4 @@ namespace Smol::Blit2D
 }
 
 
-#endif // SMOL_BLIT2D_VEC2_DEFINED
+#endif // SMOL_CORE2D_VEC2_DEFINED

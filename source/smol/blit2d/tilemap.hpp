@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <memory>
 
-#include "vec2.hpp"
-#include "size.hpp"
+#include <smol/core2d/vec2.hpp>
+#include <smol/core2d/size.hpp>
 
 
 namespace Smol::Blit2D

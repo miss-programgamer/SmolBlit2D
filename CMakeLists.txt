@@ -7,11 +7,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(SMOL_BLIT2D_BUILD_TESTS FALSE CACHE BOOL "Whether unit tests should be built")
 set(SMOL_BLIT2D_BUILD_EXAMPLES FALSE CACHE BOOL "Whether examples should be built")
 
+# Define list of core 2D source files
+set(SMOL_CORE2D_SOURCES
+	"./source/smol/core2d/vec2.hpp"
+	"./source/smol/core2d/size.hpp"
+	"./source/smol/core2d/rect.hpp"
+)
+
+# Add core 2D library target
+add_library(SmolCore2D INTERFACE ${SMOL_CORE2D_SOURCES})
+target_include_directories(SmolCore2D INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>")
+
 # Define list of project source files
 set(SMOL_BLIT2D_SOURCES
-	"./source/smol/blit2d/vec2.hpp"
-	"./source/smol/blit2d/size.hpp"
-	"./source/smol/blit2d/rect.hpp"
 	"./source/smol/blit2d/color.hpp"
 	"./source/smol/blit2d/color.cpp"
 	"./source/smol/blit2d/palette.hpp"
@@ -31,6 +39,7 @@ set(SMOL_BLIT2D_SOURCES
 # Add main library target
 add_library(SmolBlit2D STATIC ${SMOL_BLIT2D_SOURCES})
 target_include_directories(SmolBlit2D PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>")
+target_link_libraries(SmolBlit2D PUBLIC SmolCore2D)
 
 # Add example targets
 if (SMOL_BLIT2D_BUILD_EXAMPLES AND MSVC)
