@@ -8,7 +8,10 @@ namespace Smol
 	template<typename T>
 	struct Size
 	{
+		// Size width.
 		T w;
+		
+		// Size height.
 		T h;
 		
 		
