@@ -3,6 +3,10 @@
 #include <fstream>
 
 
+#define UPDATE_KEY(btn, state) btn = (btn & 0b10) | ((state & 0x8000) ? 0b01 : 0b00)
+#define UPDATE_BTN(btn, state) btn = (btn & 0b10) | ((state) ? 0b01 : 0b00);
+
+
 int Smol::Blit2D::ErrorMessageBox(const wchar_t* message, int error_code)
 {
 	MessageBoxW(NULL, message, NULL, MB_ICONERROR);
@@ -110,6 +114,10 @@ LRESULT Smol::Blit2D::ExampleApp::HandleWindowMessage(_In_ HWND hWnd, _In_ UINT 
 		case WM_SIZE:
 			return HandleSizeMessage(hWnd, message, wParam, lParam);
 		
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+			return HandleKeyboardMessage(hWnd, message, wParam, lParam);
+		
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
@@ -168,11 +176,27 @@ LRESULT Smol::Blit2D::ExampleApp::HandleSizeMessage(_In_ HWND hWnd, _In_ UINT me
 }
 
 
+LRESULT Smol::Blit2D::ExampleApp::HandleKeyboardMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
+{
+	UPDATE_KEY(input.face_n_btn, GetKeyState('S'));
+	UPDATE_KEY(input.face_s_btn, GetKeyState('Z'));
+	UPDATE_KEY(input.face_w_btn, GetKeyState('A'));
+	UPDATE_KEY(input.face_e_btn, GetKeyState('X'));
+	UPDATE_KEY(input.shld_l_btn, GetKeyState('D'));
+	UPDATE_KEY(input.shld_r_btn, GetKeyState('C'));
+	UPDATE_KEY(input.pad_n_btn,  GetKeyState(VK_UP));
+	UPDATE_KEY(input.pad_s_btn,  GetKeyState(VK_DOWN));
+	UPDATE_KEY(input.pad_w_btn,  GetKeyState(VK_LEFT));
+	UPDATE_KEY(input.pad_e_btn,  GetKeyState(VK_RIGHT));
+	return 0;
+}
+
+
 LRESULT Smol::Blit2D::ExampleApp::HandleMouseMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
-	input.mouse_l_btn = (input.mouse_l_btn & 0b10) | ((wParam & MK_LBUTTON) ? 0b01 : 0b00);
-	input.mouse_m_btn = (input.mouse_m_btn & 0b10) | ((wParam & MK_MBUTTON) ? 0b01 : 0b00);
-	input.mouse_r_btn = (input.mouse_r_btn & 0b10) | ((wParam & MK_RBUTTON) ? 0b01 : 0b00);
+	UPDATE_BTN(input.mouse_l_btn, wParam & MK_LBUTTON);
+	UPDATE_BTN(input.mouse_m_btn, wParam & MK_MBUTTON);
+	UPDATE_BTN(input.mouse_r_btn, wParam & MK_RBUTTON);
 	input.mouse_pos = { LOWORD(lParam), HIWORD(lParam) };
 	return 0;
 }

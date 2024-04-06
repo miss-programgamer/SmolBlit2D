@@ -1,6 +1,8 @@
+#include <smol/core2d.hpp>
 #include <smol/blit2d.hpp>
 #include "example_app.hpp"
 using namespace Smol::Blit2D;
+using namespace Smol;
 
 
 constexpr tileidx_t GrassTile = 1;
@@ -15,6 +17,8 @@ class App : public ExampleApp
 	
 	Bitmap smiley;
 	
+	Bitmap player_bmp;
+	
 	Bitmap ground;
 	
 	Tileset ground_tileset;
@@ -23,7 +27,11 @@ class App : public ExampleApp
 	
 	int time = 0;
 	
-	int x = 0;
+	Vec2I player_pos;
+	
+	int player_dir;
+	
+	int player_face;
 	
 	
  public:
@@ -32,10 +40,16 @@ class App : public ExampleApp
 		ExampleApp(hInstance, title, width, height),
 		renderer(160, 120),
 		ground_tileset({ 2, 2 }, { 8, 8 }),
-		tilemap(160 / 8, 120 / 8)
+		tilemap(160 / 8, 120 / 8),
+		player_pos{ 160 / 2 - 4, 88 },
+		player_dir(0),
+		player_face(1)
 	{
 		// Load a smiley bitmap
 		smiley = *ExampleApp::LoadDDS("assets/smiley.dds");
+		
+		// Load the player bitmap
+		player_bmp = *ExampleApp::LoadDDS("assets/player.dds");
 		
 		// Load a ground tileset bitmap
 		ground = *ExampleApp::LoadBMP("assets/ground.bmp");
@@ -59,11 +73,25 @@ class App : public ExampleApp
 		// Process our frame logic
 		++time;
 		
-		if (Input::IsBtnDown(input.mouse_l_btn))
-		{ x -= 1; }
+		if (Input::IsBtnPressed(input.pad_w_btn))
+		{ player_dir = -1; }
 		
-		if (Input::IsBtnDown(input.mouse_r_btn))
-		{ x += 1; }
+		if (Input::IsBtnPressed(input.pad_e_btn))
+		{ player_dir = 1; }
+		
+		if (Input::IsBtnDown(input.pad_n_btn))
+		{ player_pos.y += -1; }
+		
+		if (Input::IsBtnDown(input.pad_s_btn))
+		{ player_pos.y += 1; }
+		
+		if (Input::IsBtnReleased(input.pad_w_btn) || Input::IsBtnReleased(input.pad_e_btn))
+		{ player_dir = Input::IsBtnDown(input.pad_e_btn) - Input::IsBtnDown(input.pad_w_btn); }
+		
+		if (player_dir != 0)
+		{ player_face = player_dir; }
+		
+		player_pos.x += player_dir;
 	}
 	
 	// Draw function overriden by us.
@@ -97,7 +125,7 @@ class App : public ExampleApp
 		renderer.DrawBitmap(smiley, { 45, 45 + (((time % 60) >= 30) ? 0 : 16) });
 		
 		// Draw player
-		renderer.DrawBitmap(smiley, { x, 60 });
+		renderer.DrawBitmap(player_bmp, player_pos, { player_face == 1, false });
 		
 		// Return the result of drawing our frame
 		return renderer.GetMainTarget();

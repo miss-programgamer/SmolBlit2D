@@ -126,8 +126,8 @@ void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const Vec2I& pos, 
 	auto y = std::max<int>(0, pos.y);
 	auto w = std::min<int>({ bmp_size.w, pos.x + bmp_size.w, tsize.w - pos.x });
 	auto h = std::min<int>({ bmp_size.h, pos.y + bmp_size.h, tsize.h - pos.y });
-	int ox = (pos.x < 0) ? bmp_size.w - w : 0;
-	int oy = (pos.y < 0) ? bmp_size.h - h : 0;
+	int ox = (pos.x < 0 ^ opts.flipx) ? bmp_size.w - w : 0;
+	int oy = (pos.y < 0 ^ opts.flipy) ? bmp_size.h - h : 0;
 	
 	DrawBitmap(bitmap, { x, y }, { w, h }, { ox, oy }, opts);
 }
@@ -145,8 +145,8 @@ void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, const RectI& sourc
 	int y = std::max<int>(0, pos.y);
 	int w = std::min<int>({ src_size.w, pos.x + src_size.w, tsize.w - pos.x });
 	int h = std::min<int>({ src_size.h, pos.y + src_size.h, tsize.h - pos.y });
-	int ox = (pos.x < 0) ? source.l + src_size.w - w : source.l;
-	int oy = (pos.y < 0) ? source.t + src_size.h - h : source.t;
+	int ox = (pos.x < 0 ^ opts.flipx) ? source.l + src_size.w - w : source.l;
+	int oy = (pos.y < 0 ^ opts.flipy) ? source.t + src_size.h - h : source.t;
 	
 	DrawBitmap(bitmap, { x, y }, { w, h }, { ox, oy }, opts);
 }
@@ -165,8 +165,8 @@ void Smol::Blit2D::Renderer::DrawTile(const Bitmap& bitmap, const Tileset& tiles
 	int y = std::max<int>(0, pos.y);
 	int w = std::min<int>({ src_size.w, pos.x + src_size.w, tsize.w - pos.x });
 	int h = std::min<int>({ src_size.h, pos.y + src_size.h, tsize.h - pos.y });
-	int ox = (pos.x < 0) ? src_rect.l + src_size.w - w : src_rect.l;
-	int oy = (pos.y < 0) ? src_rect.t + src_size.h - h : src_rect.t;
+	int ox = (pos.x < 0 ^ opts.flipx) ? src_rect.l + src_size.w - w : src_rect.l;
+	int oy = (pos.y < 0 ^ opts.flipy) ? src_rect.t + src_size.h - h : src_rect.t;
 	
 	DrawBitmap(bitmap, { x, y }, { w, h }, { ox, oy }, opts);
 }
@@ -240,13 +240,16 @@ void Smol::Blit2D::Renderer::DrawBitmap(const Bitmap& bitmap, Vec2I pos, SizeI s
 			break;
 		
 		case BlitMode::Blend:
-			for (int y = 0; y < size.h; y++)
+			for (int iy = 0; iy < size.h; iy++)
 			{
-				for (int x = 0; x < size.w; x++)
+				for (int ix = 0; ix < size.w; ix++)
 				{
-					auto& base = target->At({ pos.x + x, pos.y + y });
-					const auto& other = bitmap.At({ offset.x + x, offset.y + y });
-					base = Color::Blend(base, other);
+					auto x = opts.flipx ? size.w - 1 - ix : ix;
+					auto y = opts.flipy ? size.h - 1 - iy : iy;
+					const auto& point = bitmap.At({ offset.x + x, offset.y + y });
+					
+					auto& base = target->At({ pos.x + ix, pos.y + iy });
+					base = Color::Blend(base, point);
 				}
 			}
 			break;
