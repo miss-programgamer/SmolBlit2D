@@ -56,6 +56,9 @@ if (SMOL_BLIT2D_BUILD_EXAMPLES AND MSVC)
 	
 	add_executable(SmolBlit2DExample1 WIN32 "examples/example1.cpp")
 	target_link_libraries(SmolBlit2DExample1 SmolBlit2DExampleApp SmolBlit2D)
+	
+	add_executable(SmolBlit2DExample2 WIN32 "examples/example2.cpp")
+	target_link_libraries(SmolBlit2DExample2 SmolBlit2DExampleApp SmolBlit2D)
 endif()
 
 # Enable testing

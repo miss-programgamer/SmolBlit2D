@@ -197,7 +197,7 @@ LRESULT Smol::Blit2D::ExampleApp::HandleMouseMessage(_In_ HWND hWnd, _In_ UINT m
 	UPDATE_BTN(input.mouse_l_btn, wParam & MK_LBUTTON);
 	UPDATE_BTN(input.mouse_m_btn, wParam & MK_MBUTTON);
 	UPDATE_BTN(input.mouse_r_btn, wParam & MK_RBUTTON);
-	input.mouse_pos = { LOWORD(lParam), HIWORD(lParam) };
+	input.mouse_pos = { LOWORD(lParam) / 4, HIWORD(lParam) / 4 };
 	return 0;
 }
 

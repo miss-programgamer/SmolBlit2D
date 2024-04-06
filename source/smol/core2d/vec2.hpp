@@ -72,28 +72,28 @@ namespace Smol::Core2D
 	
 	
 	template<typename T>
-	constexpr Vec2<T>& operator+(Vec2<T>& lhs, const Vec2<T>& rhs)
+	constexpr Vec2<T>& operator+=(Vec2<T>& lhs, const Vec2<T>& rhs)
 	{ lhs = lhs + rhs; return lhs; }
 	
 	template<typename T>
-	constexpr Vec2<T>& operator-(Vec2<T>& lhs, const Vec2<T>& rhs)
+	constexpr Vec2<T>& operator-=(Vec2<T>& lhs, const Vec2<T>& rhs)
 	{ lhs = lhs - rhs; return lhs; }
 	
 	template<typename T>
-	constexpr Vec2<T>& operator*(Vec2<T>& lhs, const Vec2<T>& rhs)
+	constexpr Vec2<T>& operator*=(Vec2<T>& lhs, const Vec2<T>& rhs)
 	{ lhs = lhs * rhs; return lhs; }
 	
 	template<typename T>
-	constexpr Vec2<T>& operator/(Vec2<T>& lhs, const Vec2<T>& rhs)
+	constexpr Vec2<T>& operator/=(Vec2<T>& lhs, const Vec2<T>& rhs)
 	{ lhs = lhs / rhs; return lhs; }
 	
 	
 	template<typename T>
-	constexpr Vec2<T>& operator*(Vec2<T>& lhs, const T& rhs)
+	constexpr Vec2<T>& operator*=(Vec2<T>& lhs, const T& rhs)
 	{ lhs = lhs * rhs; return lhs; }
 	
 	template<typename T>
-	constexpr Vec2<T>& operator/(Vec2<T>& lhs, const T& rhs)
+	constexpr Vec2<T>& operator/=(Vec2<T>& lhs, const T& rhs)
 	{ lhs = lhs / rhs; return lhs; }
 }
 
