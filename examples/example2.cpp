@@ -9,7 +9,7 @@ using namespace Smol;
 // Example 1 main app class
 class App : public ExampleApp
 {
-	static constexpr SizeI CardSize{ 13, 18 };
+	static constexpr SizeI CardSize = SizeI(13, 18);
 	
 	
 	Renderer renderer;
@@ -32,14 +32,14 @@ class App : public ExampleApp
 		renderer(160, 120),
 		cards_pos
 		{
-			Vec2I{ 23, 46 },
-			Vec2I{ 120, 32 },
-			Vec2I{ 96, 100 },
-			Vec2I{ 140, 60 },
-			Vec2I{ 150, 10 },
-			Vec2I{ 2, 90 },
-			Vec2I{ 50, 30 },
-			Vec2I{ 80, 5 },
+			Vec2I(23, 46),
+			Vec2I(120, 32),
+			Vec2I(96, 100),
+			Vec2I(140, 60),
+			Vec2I(150, 10),
+			Vec2I(2, 90),
+			Vec2I(50, 30),
+			Vec2I(80, 5),
 		},
 		lift_index(-1)
 	{
@@ -101,7 +101,7 @@ class App : public ExampleApp
 		{
 			if (lift_index == i)
 			{
-				renderer.DrawBitmap(cards[i], cards_pos[i] - Vec2I{ 1, 1 });
+				renderer.DrawBitmap(cards[i], cards_pos[i] - Vec2I(1));
 				renderer.DrawBitmap(shadow, cards_pos[i]);
 			}
 			else

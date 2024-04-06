@@ -41,7 +41,7 @@ class App : public ExampleApp
 		renderer(160, 120),
 		ground_tileset({ 2, 2 }, { 8, 8 }),
 		tilemap(160 / 8, 120 / 8),
-		player_pos{ 160 / 2 - 4, 88 },
+		player_pos(160 / 2 - 4, 88),
 		player_dir(0),
 		player_face(1)
 	{

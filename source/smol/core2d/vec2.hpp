@@ -18,6 +18,22 @@ namespace Smol::Core2D
 		T y;
 		
 		
+		// Construct a zero vector.
+		constexpr Vec2() noexcept(noexcept(T())):
+			x(0), y(0)
+		{}
+		
+		// Construct a vector where both values are the one given.
+		constexpr explicit Vec2(T value) noexcept(noexcept(T())):
+			x(value), y(value)
+		{}
+		
+		// Construct a vector composed of x and y.
+		constexpr Vec2(T x, T y) noexcept(noexcept(T())):
+			x(x), y(y)
+		{}
+		
+		
 		// Get the dot product of this vector and another.
 		constexpr T GetDot(const Vec2<T>& other) const
 		{ return { x * other.x + y * other.y }; }
