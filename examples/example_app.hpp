@@ -5,6 +5,7 @@
 #include <optional>
 #include <string_view>
 #include <functional>
+#include <filesystem>
 
 #include <windows.h>
 #include <tchar.h>
@@ -105,10 +106,10 @@ namespace Smol::Blit2D
 		static bool RegisterWindowClass(HINSTANCE hInstance);
 		
 		// Load a bitmap from a .bmp file.
-		static std::optional<Bitmap> LoadBMP(const char* filename);
+		static std::optional<Bitmap> LoadBMP(const std::filesystem::path& filename);
 		
 		// Load a bitmap from a .dds file.
-		static std::optional<Bitmap> LoadDDS(const char* filename);
+		static std::optional<Bitmap> LoadDDS(const std::filesystem::path& filename);
 	};
 }
 

@@ -276,7 +276,7 @@ bool Smol::Blit2D::ExampleApp::RegisterWindowClass(HINSTANCE hInstance)
 }
 
 
-std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadBMP(const char* filename)
+std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadBMP(const std::filesystem::path& filename)
 {
 	// open bitmap file
 	std::ifstream file(filename, std::ios::binary);
@@ -370,7 +370,7 @@ std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadBMP(const char
 }
 
 
-std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadDDS(const char* filename)
+std::optional<Smol::Blit2D::Bitmap> Smol::Blit2D::ExampleApp::LoadDDS(const std::filesystem::path& filename)
 {
 	// NOTE: this function has like zero error handling and is really basic
 	//       don't actually use this for anything important y'all

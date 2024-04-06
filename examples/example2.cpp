@@ -1,9 +1,32 @@
 #include <array>
+#include <string>
+#include <random>
 #include <smol/core2d.hpp>
 #include <smol/blit2d.hpp>
 #include "example_app.hpp"
 using namespace Smol::Blit2D;
 using namespace Smol;
+namespace fs = std::filesystem;
+
+
+// Asset directory containing card sprites
+static const fs::path cards_dir = "assets/cards";
+
+// Array of card suits
+static const std::string card_suits[]
+{ "hearts", "diamonds", "spades", "clubs" };
+
+// Array of card ranks
+static const std::string card_ranks[]
+{ "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace" };
+
+
+struct Card
+{
+	Vec2I pos;
+	
+	int card;
+};
 
 
 // Example 1 main app class
@@ -14,11 +37,11 @@ class App : public ExampleApp
 	
 	Renderer renderer;
 	
-	std::array<Bitmap, 8> cards;
+	std::array<Bitmap, 52> card_bmps;
 	
 	Bitmap shadow;
 	
-	std::array<Vec2I, 8> cards_pos;
+	std::array<Card, 52> cards;
 	
 	int lift_index;
 	
@@ -30,28 +53,27 @@ class App : public ExampleApp
 	App(HINSTANCE hInstance, const wchar_t* title, SizeI size, int scale) noexcept:
 		ExampleApp(hInstance, title, { scale * size.w, scale * size.h }),
 		renderer(size.w, size.h),
-		cards_pos
-		{
-			Vec2I(23, 46),
-			Vec2I(120, 32),
-			Vec2I(96, 100),
-			Vec2I(140, 60),
-			Vec2I(150, 10),
-			Vec2I(2, 90),
-			Vec2I(50, 30),
-			Vec2I(80, 5),
-		},
 		lift_index(-1)
 	{
 		// Load card bitmaps
-		cards[0] = *ExampleApp::LoadDDS("assets/cards/ace-hearts.dds");
-		cards[1] = *ExampleApp::LoadDDS("assets/cards/ace-diamonds.dds");
-		cards[2] = *ExampleApp::LoadDDS("assets/cards/ace-spades.dds");
-		cards[3] = *ExampleApp::LoadDDS("assets/cards/ace-clubs.dds");
-		cards[4] = *ExampleApp::LoadDDS("assets/cards/2-hearts.dds");
-		cards[5] = *ExampleApp::LoadDDS("assets/cards/2-diamonds.dds");
-		cards[6] = *ExampleApp::LoadDDS("assets/cards/2-spades.dds");
-		cards[7] = *ExampleApp::LoadDDS("assets/cards/2-clubs.dds");
+		int i = 0;
+		
+		for (const auto& suit : card_suits)
+		{
+			for (const auto& rank : card_ranks)
+			{
+				if (auto result = ExampleApp::LoadDDS(cards_dir/(rank + "-" + suit + ".dds")))
+				{ card_bmps[i++] = std::move(*result); }
+			}
+		}
+		
+		// Randomly position our cards
+		std::mt19937 mt;
+		std::uniform_int_distribution x_dist{ 4, size.w - CardSize.w - 4 };
+		std::uniform_int_distribution y_dist{ 4, size.h - CardSize.h - 4 };
+		
+		for (auto& card : cards)
+		{ card.pos = { x_dist(mt), y_dist(mt) }; }
 		
 		// Load the shadow bitmap
 		shadow = *ExampleApp::LoadDDS("assets/shadow.dds");
@@ -66,12 +88,12 @@ class App : public ExampleApp
 		{
 			if (lift_index == -1)
 			{
-				for (int i = 0; i < cards_pos.size(); i++)
+				for (int i = 0; i < cards.size(); i++)
 				{
-					if (RectI(cards_pos[i], CardSize).Contains(input.mouse_pos))
+					if (RectI(cards[i].pos, CardSize).Contains(input.mouse_pos))
 					{
 						lift_index = i;
-						lift_pos = input.mouse_pos - cards_pos[i];
+						lift_pos = input.mouse_pos - cards[i].pos;
 						break;
 					}
 				}
@@ -83,7 +105,7 @@ class App : public ExampleApp
 		}
 		
 		if (lift_index != -1)
-		{ cards_pos[lift_index] = input.mouse_pos - lift_pos; }
+		{ cards[lift_index].pos = input.mouse_pos - lift_pos; }
 	}
 	
 	// Draw function overriden by us.
@@ -97,17 +119,17 @@ class App : public ExampleApp
 		// Draw some cards to the main target
 		renderer.SetBlitMode(BlitMode::Blend);
 		
-		for (int i = 0; i < cards_pos.size(); i++)
+		for (int i = 0; i < cards.size(); i++)
 		{
-			if (lift_index == i)
-			{
-				renderer.DrawBitmap(cards[i], cards_pos[i] - Vec2I(1));
-				renderer.DrawBitmap(shadow, cards_pos[i]);
-			}
-			else
-			{
-				renderer.DrawBitmap(cards[i], cards_pos[i]);
-			}
+			if (lift_index != i)
+			{ renderer.DrawBitmap(card_bmps[i], cards[i].pos); }
+		}
+		
+		// Draw lifted card above the rest
+		if (lift_index != -1)
+		{
+			renderer.DrawBitmap(card_bmps[lift_index], cards[lift_index].pos - Vec2I(1));
+			renderer.DrawBitmap(shadow, cards[lift_index].pos);
 		}
 		
 		// Return the result of drawing our frame
