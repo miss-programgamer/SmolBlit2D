@@ -59,11 +59,8 @@ namespace Smol::Blit2D
 		
 		
 	 public:
-		// Register example app window class.
-		static bool RegisterWindowClass(HINSTANCE hInstance);
-		
 		// Construct an example app.
-		ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept;
+		ExampleApp(HINSTANCE hInstance, const wchar_t* title, SizeI win_size) noexcept;
 		
 		// Show this example app's main window.
 		void ShowMainWindow(int nCmdShow);
@@ -104,6 +101,9 @@ namespace Smol::Blit2D
 		
 		
 	 public:
+		// Register example app window class.
+		static bool RegisterWindowClass(HINSTANCE hInstance);
+		
 		// Load a bitmap from a .bmp file.
 		static std::optional<Bitmap> LoadBMP(const char* filename);
 		

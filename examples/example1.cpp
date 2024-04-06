@@ -36,9 +36,9 @@ class App : public ExampleApp
 	
  public:
 	// Construct an app instance.
-	App(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept:
-		ExampleApp(hInstance, title, width, height),
-		renderer(160, 120),
+	App(HINSTANCE hInstance, const wchar_t* title, SizeI size, int scale) noexcept:
+		ExampleApp(hInstance, title, { scale * size.w, scale * size.h }),
+		renderer(size.w, size.h),
 		ground_tileset({ 2, 2 }, { 8, 8 }),
 		tilemap(160 / 8, 120 / 8),
 		player_pos(160 / 2 - 4, 88),
@@ -140,7 +140,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{ return ErrorMessageBox(L"Failed to register main window class", 1); }
 	
 	// Create example app
-	App app(hInstance, L"Example 1", 640, 480);
+	App app(hInstance, L"Example 1", { 160, 120 }, 6);
 	
 	if (!app)
 	{ return ErrorMessageBox(L"Failed to create main window", 1); }

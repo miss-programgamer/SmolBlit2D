@@ -28,28 +28,7 @@ int Smol::Blit2D::StartMessageLoop()
 }
 
 
-bool Smol::Blit2D::ExampleApp::RegisterWindowClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-	
-	wcex.cbSize         = sizeof(WNDCLASSEX);
-	wcex.style          = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc    = WindowProc;
-	wcex.cbClsExtra     = 0;
-	wcex.cbWndExtra     = 0;
-	wcex.hInstance      = hInstance;
-	wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName   = NULL;
-	wcex.lpszClassName  = szMainWindowClass.data();
-	wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-	
-	return RegisterClassEx(&wcex);
-}
-
-
-Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view title, int width, int height) noexcept:
+Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, const wchar_t* title, SizeI win_size) noexcept:
 	input{},
 	time_target(16)
 {
@@ -58,19 +37,19 @@ Smol::Blit2D::ExampleApp::ExampleApp(HINSTANCE hInstance, std::wstring_view titl
 	const DWORD ex_style = WS_EX_OVERLAPPEDWINDOW;
 	
 	// Request a client rect instead of a window rect
-	RECT rect{ 0, 0, width, height };
+	RECT rect{ 0, 0, win_size.w, win_size.h };
 	AdjustWindowRectEx(&rect, style, false, ex_style);
-	width = rect.right - rect.left;
-	height = rect.bottom - rect.top;
+	win_size.w = rect.right - rect.left;
+	win_size.h = rect.bottom - rect.top;
 	
 	// Create our window
 	hWnd = CreateWindowEx(
 		ex_style,
 		szMainWindowClass.data(),
-		title.data(),
+		title,
 		style,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		width, height,
+		win_size.w, win_size.h,
 		NULL,
 		NULL,
 		hInstance,
@@ -143,7 +122,7 @@ LRESULT Smol::Blit2D::ExampleApp::HandleCreateMessage(_In_ HWND hWnd, _In_ UINT 
 {
 	prev_time = GetTickCount64();
 	
-	RECT rect; GetWindowRect(hWnd, &rect);
+	RECT rect; GetClientRect(hWnd, &rect);
 	auto size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
 	
 	DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&direct_write_factory));
@@ -194,10 +173,18 @@ LRESULT Smol::Blit2D::ExampleApp::HandleKeyboardMessage(_In_ HWND hWnd, _In_ UIN
 
 LRESULT Smol::Blit2D::ExampleApp::HandleMouseMessage(_In_ HWND hWnd, _In_ UINT message, _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
+	RECT rect; GetClientRect(hWnd, &rect);
+	auto win_size = D2D1::SizeU(rect.right - rect.left, rect.bottom - rect.top);
+	auto target_size = bitmap_target->GetPixelSize();
+	
 	UPDATE_BTN(input.mouse_l_btn, wParam & MK_LBUTTON);
 	UPDATE_BTN(input.mouse_m_btn, wParam & MK_MBUTTON);
 	UPDATE_BTN(input.mouse_r_btn, wParam & MK_RBUTTON);
-	input.mouse_pos = { LOWORD(lParam) / 4, HIWORD(lParam) / 4 };
+	input.mouse_pos = Vec2I
+	{
+		int(LOWORD(lParam) * target_size.width / win_size.width),
+		int(HIWORD(lParam) * target_size.height / win_size.height),
+	};
 	return 0;
 }
 
@@ -265,6 +252,27 @@ void Smol::Blit2D::ExampleApp::UpdateBitmapTarget(const Bitmap& bitmap)
 		auto props = D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_R32G32B32A32_FLOAT, D2D1_ALPHA_MODE_IGNORE));
 		rt->CreateBitmap(bitmap_size, &bitmap.At({ 0, 0 }), sizeof(float) * 4 * bitmap.GetWidth(), props, &bitmap_target);
 	}
+}
+
+
+bool Smol::Blit2D::ExampleApp::RegisterWindowClass(HINSTANCE hInstance)
+{
+	WNDCLASSEX wcex;
+	
+	wcex.cbSize         = sizeof(WNDCLASSEX);
+	wcex.style          = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc    = WindowProc;
+	wcex.cbClsExtra     = 0;
+	wcex.cbWndExtra     = 0;
+	wcex.hInstance      = hInstance;
+	wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+	wcex.lpszMenuName   = NULL;
+	wcex.lpszClassName  = szMainWindowClass.data();
+	wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+	
+	return RegisterClassEx(&wcex);
 }
 
 
