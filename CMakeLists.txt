@@ -7,39 +7,36 @@ set(CMAKE_CXX_STANDARD 20)
 set(SMOL_BLIT2D_BUILD_TESTS FALSE CACHE BOOL "Whether unit tests should be built")
 set(SMOL_BLIT2D_BUILD_EXAMPLES FALSE CACHE BOOL "Whether examples should be built")
 
-# Define list of core 2D source files
-set(SMOL_CORE2D_SOURCES
-	"./source/smol/core2d/vec2.hpp"
-	"./source/smol/core2d/size.hpp"
-	"./source/smol/core2d/rect.hpp"
-)
-
-# Add core 2D library target
-add_library(SmolCore2D INTERFACE ${SMOL_CORE2D_SOURCES})
-target_include_directories(SmolCore2D INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>")
+# Find required packages
+find_package(SmolCore2D REQUIRED)
 
 # Define list of project source files
-set(SMOL_BLIT2D_SOURCES
+set(SMOL_BLIT2D_HEADERS
 	"./source/smol/blit2d/color.hpp"
-	"./source/smol/blit2d/color.cpp"
 	"./source/smol/blit2d/palette.hpp"
 	"./source/smol/blit2d/pal_bitmap.hpp"
-	"./source/smol/blit2d/pal_bitmap.cpp"
 	"./source/smol/blit2d/bitmap.hpp"
-	"./source/smol/blit2d/bitmap.cpp"
 	"./source/smol/blit2d/tileset.hpp"
-	"./source/smol/blit2d/tileset.cpp"
 	"./source/smol/blit2d/tilemap.hpp"
-	"./source/smol/blit2d/tilemap.cpp"
 	"./source/smol/blit2d/renderer.hpp"
-	"./source/smol/blit2d/renderer.cpp"
 	"./source/smol/blit2d.hpp"
+)
+
+set(SMOL_BLIT2D_SOURCES
+	"./source/smol/blit2d/color.cpp"
+	"./source/smol/blit2d/pal_bitmap.cpp"
+	"./source/smol/blit2d/bitmap.cpp"
+	"./source/smol/blit2d/tileset.cpp"
+	"./source/smol/blit2d/tilemap.cpp"
+	"./source/smol/blit2d/renderer.cpp"
 )
 
 # Add main library target
 add_library(SmolBlit2D STATIC ${SMOL_BLIT2D_SOURCES})
+target_sources(SmolBlit2D PUBLIC FILE_SET HEADERS BASE_DIRS "source" FILES ${SMOL_BLIT2D_HEADERS})
 target_include_directories(SmolBlit2D PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>")
-target_link_libraries(SmolBlit2D PUBLIC SmolCore2D)
+target_include_directories(SmolBlit2D PUBLIC "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+target_link_libraries(SmolBlit2D PUBLIC Smol::SmolCore2D)
 
 # Add example targets
 if (SMOL_BLIT2D_BUILD_EXAMPLES AND MSVC)
@@ -76,3 +73,23 @@ endif()
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
+# Generate CMake integration scripts
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+configure_package_config_file("cmake/Config.cmake.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/SmolBlit2DConfig.cmake"
+	INSTALL_DESTINATION "lib/cmake/SmolBlit2D"
+)
+
+write_basic_package_version_file(SmolBlit2DConfigVersion.cmake
+	VERSION ${CMAKE_PROJECT_VERSION}
+	COMPATIBILITY SameMajorVersion
+)
+
+# Install targets & scripts
+install(TARGETS SmolBlit2D EXPORT SmolBlit2DTargets LIBRARY DESTINATION ${CMAKE_CURRENT_BINARY_DIR} FILE_SET HEADERS)
+install(EXPORT SmolBlit2DTargets FILE SmolBlit2DTargets.cmake NAMESPACE Smol:: DESTINATION "lib/cmake/SmolBlit2D")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SmolBlit2DConfigVersion.cmake" DESTINATION "lib/cmake/SmolBlit2D")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SmolBlit2DConfig.cmake" DESTINATION "lib/cmake/SmolBlit2D")
